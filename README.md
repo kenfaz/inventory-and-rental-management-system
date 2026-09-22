@@ -1,1 +1,1 @@
-# Inventory-and-Rental-Management-System-
+# Business background
