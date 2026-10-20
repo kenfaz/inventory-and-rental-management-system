@@ -86,7 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #1E1030 0%, #3B1F6E 100%);
+      background:
+        linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+        url('/tailorshop/public/assets/login_background.jpg') center / cover no-repeat fixed;
     }
     .login-card {
       width: 100%; max-width: 420px;
@@ -104,6 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       font-weight: 500; padding: 10px;
     }
     .btn-login:hover { background: #6D28D9; color: #fff; }
+    .input-group-text {
+      background: #171717;
+      border-color: #333;
+      color: #D4D4D4;
+    }
     .form-control:focus {
       border-color: #7C3AED;
       box-shadow: 0 0 0 3px rgba(124,58,237,.15);

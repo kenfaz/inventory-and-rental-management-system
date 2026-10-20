@@ -5,6 +5,8 @@
 // Requires $pageTitle to be set by the including file
 // ============================================================
 
+require_once __DIR__ . '/../config/constants.php';
+
 $pageTitle = $pageTitle ?? "Desire's Tailor Shop";
 ?>
 <!DOCTYPE html>
