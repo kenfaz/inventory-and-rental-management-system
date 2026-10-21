@@ -191,13 +191,13 @@ $customers = $pdo->query('
 $garments = $pdo->query("
     SELECT garment_id, garment_name, garment_code, size, color, sale_price
     FROM garment_items
-    WHERE availability_status = 'Available' AND sale_price > 0
+    WHERE availability_status = 'Available'
     ORDER BY garment_name
 ")->fetchAll();
 $materials = $pdo->query('
     SELECT item_id, item_name, brand, quantity, unit, sale_price
     FROM material_items
-    WHERE quantity > 0 AND sale_price > 0
+    WHERE quantity > 0
     ORDER BY item_name
 ')->fetchAll();
 $success = $_SESSION['success'] ?? '';
@@ -277,10 +277,13 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                     <optgroup label="Garments">
                       <?php foreach ($garments as $garment):
                         $productValue = 'garment:' . $garment['garment_id'];
-                        $details = $garment['garment_code'] . ' · ₱' . number_format((float)$garment['sale_price'], 2);
+                        $hasPrice = $garment['sale_price'] !== null && (float)$garment['sale_price'] > 0;
+                        $details = $garment['garment_code'] . ' · ' .
+                            ($hasPrice ? '₱' . number_format((float)$garment['sale_price'], 2) : 'Price not set');
                         if ($garment['size']) $details .= ' · Size ' . $garment['size'];
                       ?>
-                        <option value="<?= $productValue ?>" data-type="garment" data-price="<?= htmlspecialchars((string)$garment['sale_price']) ?>"
+                        <option value="<?= $productValue ?>" data-type="garment" data-price="<?= $hasPrice ? htmlspecialchars((string)$garment['sale_price']) : '0' ?>"
+                          <?= $hasPrice ? '' : 'disabled' ?>
                           <?= $values['product'] === $productValue ? 'selected' : '' ?>>
                           <?= htmlspecialchars($garment['garment_name'] . ' — ' . $details) ?>
                         </option>
@@ -291,10 +294,15 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                     <optgroup label="Materials">
                       <?php foreach ($materials as $material):
                         $productValue = 'material:' . $material['item_id'];
+                        $hasPrice = $material['sale_price'] !== null && (float)$material['sale_price'] > 0;
                         $details = rtrim(rtrim(number_format((float)$material['quantity'], 2), '0'), '.') .
-                            ' ' . $material['unit'] . ' available · ₱' . number_format((float)$material['sale_price'], 2) . '/' . $material['unit'];
+                            ' ' . $material['unit'] . ' available · ' .
+                            ($hasPrice
+                                ? '₱' . number_format((float)$material['sale_price'], 2) . '/' . $material['unit']
+                                : 'Price not set');
                       ?>
-                        <option value="<?= $productValue ?>" data-type="material" data-price="<?= htmlspecialchars((string)$material['sale_price']) ?>"
+                        <option value="<?= $productValue ?>" data-type="material" data-price="<?= $hasPrice ? htmlspecialchars((string)$material['sale_price']) : '0' ?>"
+                          <?= $hasPrice ? '' : 'disabled' ?>
                           <?= $values['product'] === $productValue ? 'selected' : '' ?>>
                           <?= htmlspecialchars($material['item_name'] . ' — ' . $details) ?>
                         </option>
@@ -306,7 +314,9 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                   <div class="invalid-feedback"><?= htmlspecialchars($errors['product']) ?></div>
                 <?php endif; ?>
                 <?php if (!$garments && !$materials): ?>
-                  <div class="form-text">No available items have a sale price. Admins can set prices in inventory.</div>
+                  <div class="form-text">No garments are available and no materials are in stock.</div>
+                <?php elseif (array_filter(array_merge($garments, $materials), static fn($item) => $item['sale_price'] === null || (float)$item['sale_price'] <= 0)): ?>
+                  <div class="form-text">Items marked “Price not set” are unavailable for checkout until an admin sets a catalog price.</div>
                 <?php endif; ?>
               </div>
 
