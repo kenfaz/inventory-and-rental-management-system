@@ -28,6 +28,20 @@ function getLoginCooldownSeconds(PDO $pdo, string $attemptKey): int
     return $remaining === false ? 0 : (int) $remaining;
 }
 
+function getLoginFailedAttemptCount(PDO $pdo, string $attemptKey): int
+{
+    $stmt = $pdo->prepare('
+        SELECT failed_attempts
+        FROM login_attempts
+        WHERE attempt_key = ?
+          AND last_failed_at >= DATE_SUB(NOW(), INTERVAL ' . LOGIN_ATTEMPT_WINDOW_MINUTES . ' MINUTE)
+    ');
+    $stmt->execute([$attemptKey]);
+    $attempts = $stmt->fetchColumn();
+
+    return $attempts === false ? 0 : (int) $attempts;
+}
+
 function recordFailedLoginAttempt(PDO $pdo, string $attemptKey): int
 {
     $pdo->beginTransaction();

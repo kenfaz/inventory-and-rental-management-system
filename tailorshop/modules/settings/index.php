@@ -56,6 +56,20 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       </div>
     </div>
 
+    <div class="card mb-4">
+      <div class="card-body d-flex align-items-center justify-content-between gap-3 flex-wrap">
+        <div>
+          <h6 class="mb-1"><i class="bi bi-circle-half me-2 text-primary"></i>Appearance</h6>
+          <p class="text-muted small mb-0" id="theme-status">Dark mode is currently active.</p>
+        </div>
+        <button type="button" class="btn btn-outline-primary" id="theme-toggle"
+                aria-label="Switch to light mode" aria-pressed="false">
+          <i class="bi bi-sun me-1" aria-hidden="true"></i>
+          <span>Switch to light mode</span>
+        </button>
+      </div>
+    </div>
+
     <!-- System overview stats -->
     <div class="row g-3 mb-4">
       <?php
@@ -219,7 +233,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                 <?php $count = $pdo->query("SELECT COUNT(*) FROM `{$t}`")->fetchColumn(); ?>
                 <div class="col-6">
                   <div class="d-flex justify-content-between align-items-center
-                              px-2 py-1 rounded" style="background:#f9fafb">
+                              px-2 py-1 rounded settings-table-count">
                     <span class="text-muted" style="font-size:12px;font-family:monospace">
                       <?= $t ?>
                     </span>

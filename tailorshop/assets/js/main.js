@@ -5,6 +5,74 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // ── Save and apply the selected color theme ─────────────────
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    const themeStatus = document.getElementById('theme-status');
+    const themeLabel = themeToggle.querySelector('span');
+    const themeIcon = themeToggle.querySelector('i');
+
+    function updateThemeControl(theme) {
+      const lightMode = theme === 'light';
+      themeToggle.setAttribute('aria-pressed', String(lightMode));
+      themeToggle.setAttribute(
+        'aria-label',
+        lightMode ? 'Switch to dark mode' : 'Switch to light mode'
+      );
+      if (themeLabel) {
+        themeLabel.textContent = lightMode ? 'Switch to dark mode' : 'Switch to light mode';
+      }
+      if (themeIcon) {
+        themeIcon.className = `bi ${lightMode ? 'bi-moon' : 'bi-sun'} me-1`;
+      }
+      if (themeStatus) {
+        themeStatus.textContent = `${lightMode ? 'Light' : 'Dark'} mode is currently active.`;
+      }
+    }
+
+    updateThemeControl(document.documentElement.dataset.theme);
+    themeToggle.addEventListener('click', () => {
+      const theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('tailorshop-theme', theme);
+      document.documentElement.dataset.theme = theme;
+      updateThemeControl(theme);
+    });
+  }
+
+  // ── Expand or collapse sidebar navigation sections ──────────
+  document.querySelectorAll('[data-nav-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      const section = document.getElementById(toggle.getAttribute('aria-controls'));
+      if (!section) return;
+
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      section.hidden = expanded;
+    });
+  });
+
+  // ── Collapse or expand the sidebar navigation ──────────────
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  if (sidebarToggle) {
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+
+    sidebarToggle.addEventListener('click', () => {
+      const collapsed = document.body.classList.toggle('sidebar-collapsed');
+      sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+      sidebarToggle.setAttribute(
+        'aria-label',
+        collapsed ? 'Expand navigation' : 'Collapse navigation'
+      );
+      sidebarLinks.forEach(link => {
+        if (collapsed) {
+          link.title = link.textContent.trim();
+        } else {
+          link.removeAttribute('title');
+        }
+      });
+    });
+  }
+
   // ── Auto-dismiss flash alerts after 4 seconds ─────────────
   document.querySelectorAll('.alert-dismissible').forEach(alert => {
     setTimeout(() => {

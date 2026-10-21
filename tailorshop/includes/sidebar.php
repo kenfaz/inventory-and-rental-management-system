@@ -30,20 +30,30 @@ function navActive(string $page, string $current): string {
 
 <aside class="sidebar">
 
-  <!-- Brand -->
-  <a href="<?= $dashLink ?>" class="sidebar-brand">
-    <div class="sidebar-brand-icon">
-      <i class="bi bi-scissors"></i>
-    </div>
-    <div>
-      <div class="sidebar-brand-name">Desire's</div>
-      <div class="sidebar-brand-sub">Tailor Shop</div>
-    </div>
-  </a>
+  <div class="sidebar-header">
+    <button type="button" class="sidebar-toggle" id="sidebar-toggle"
+            aria-label="Collapse navigation" aria-expanded="true"
+            aria-controls="sidebar-navigation">
+      <i class="bi bi-list"></i>
+    </button>
+    <a href="<?= $dashLink ?>" class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <i class="bi bi-scissors"></i>
+      </div>
+      <div>
+        <div class="sidebar-brand-name">Desire's</div>
+        <div class="sidebar-brand-sub">Tailor Shop</div>
+      </div>
+    </a>
+  </div>
 
   <!-- Main navigation -->
-  <div class="sidebar-section">Main</div>
-  <ul class="sidebar-nav">
+  <nav id="sidebar-navigation" aria-label="Main navigation">
+  <button type="button" class="sidebar-section" data-nav-toggle
+          aria-expanded="true" aria-controls="nav-main">
+    <span>Main</span><i class="bi bi-chevron-down" aria-hidden="true"></i>
+  </button>
+  <ul class="sidebar-nav" id="nav-main">
     <li>
       <a href="<?= $dashLink ?>" class="<?= navActive('dashboard', $activePage) ?>">
         <i class="bi bi-speedometer2"></i> Dashboard
@@ -52,8 +62,11 @@ function navActive(string $page, string $current): string {
   </ul>
 
   <!-- Inventory -->
-  <div class="sidebar-section">Inventory</div>
-  <ul class="sidebar-nav">
+  <button type="button" class="sidebar-section" data-nav-toggle
+          aria-expanded="true" aria-controls="nav-inventory">
+    <span>Inventory</span><i class="bi bi-chevron-down" aria-hidden="true"></i>
+  </button>
+  <ul class="sidebar-nav" id="nav-inventory">
     <li>
       <a href="/tailorshop/modules/inventory/materials/index.php"
          class="<?= navActive('inventory-materials', $activePage) ?>">
@@ -69,8 +82,11 @@ function navActive(string $page, string $current): string {
   </ul>
 
   <!-- Operations -->
-  <div class="sidebar-section">Operations</div>
-  <ul class="sidebar-nav">
+  <button type="button" class="sidebar-section" data-nav-toggle
+          aria-expanded="true" aria-controls="nav-operations">
+    <span>Operations</span><i class="bi bi-chevron-down" aria-hidden="true"></i>
+  </button>
+  <ul class="sidebar-nav" id="nav-operations">
     <li>
       <a href="/tailorshop/modules/customers/index.php"
          class="<?= navActive('customers', $activePage) ?>">
@@ -99,8 +115,11 @@ function navActive(string $page, string $current): string {
 
   <!-- Admin-only sections -->
   <?php if ($role === 'admin'): ?>
-    <div class="sidebar-section">Reports</div>
-    <ul class="sidebar-nav">
+    <button type="button" class="sidebar-section" data-nav-toggle
+            aria-expanded="true" aria-controls="nav-reports">
+      <span>Reports</span><i class="bi bi-chevron-down" aria-hidden="true"></i>
+    </button>
+    <ul class="sidebar-nav" id="nav-reports">
       <li>
         <a href="/tailorshop/modules/sales/index.php"
            class="<?= navActive('sales', $activePage) ?>">
@@ -115,8 +134,11 @@ function navActive(string $page, string $current): string {
       </li>
     </ul>
 
-    <div class="sidebar-section">Admin</div>
-    <ul class="sidebar-nav">
+    <button type="button" class="sidebar-section" data-nav-toggle
+            aria-expanded="true" aria-controls="nav-admin">
+      <span>Admin</span><i class="bi bi-chevron-down" aria-hidden="true"></i>
+    </button>
+    <ul class="sidebar-nav" id="nav-admin">
       <li>
         <a href="/tailorshop/modules/users/index.php"
            class="<?= navActive('users', $activePage) ?>">
@@ -143,6 +165,7 @@ function navActive(string $page, string $current): string {
       </li>
     </ul>
   <?php endif; ?>
+  </nav>
 
   <!-- Sidebar footer: user info + logout -->
   <div class="sidebar-footer">

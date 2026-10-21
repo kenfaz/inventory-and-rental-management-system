@@ -17,6 +17,7 @@ if (isset($_SESSION['user_id'])) {
 
 $error   = '';
 $email   = '';
+$failedAttempts = null;
 $timeout = isset($_GET['reason']) && $_GET['reason'] === 'timeout';
 $reset   = isset($_GET['reason']) && $_GET['reason'] === 'reset';
 
@@ -29,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $attemptKey = loginAttemptKey($email, $_SERVER['REMOTE_ADDR'] ?? '');
         $cooldownSeconds = getLoginCooldownSeconds($pdo, $attemptKey);
+        $failedAttempts = getLoginFailedAttemptCount($pdo, $attemptKey);
 
         if ($cooldownSeconds > 0) {
             $minutesRemaining = (int) ceil($cooldownSeconds / 60);
@@ -79,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             if ($cooldownSeconds === 0) {
                 $cooldownMinutes = recordFailedLoginAttempt($pdo, $attemptKey);
+                $failedAttempts = getLoginFailedAttemptCount($pdo, $attemptKey);
                 $error = $cooldownMinutes > 0
                     ? "Too many failed attempts. Please try again in {$cooldownMinutes} minutes."
                     : 'Invalid email or password. Please try again.';
@@ -164,6 +167,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small">
         <i class="bi bi-exclamation-circle"></i>
         <?= htmlspecialchars($error) ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if ($failedAttempts !== null && $failedAttempts > 0): ?>
+      <div class="small text-muted mb-3" role="status" aria-live="polite">
+        Failed login attempts: <?= min($failedAttempts, LOGIN_MAX_ATTEMPTS) ?>
+        of <?= LOGIN_MAX_ATTEMPTS ?>.
+        <?php if ($failedAttempts < LOGIN_MAX_ATTEMPTS): ?>
+          <?= LOGIN_MAX_ATTEMPTS - $failedAttempts ?> attempt(s) remaining.
+        <?php else: ?>
+          Login temporarily locked.
+        <?php endif; ?>
       </div>
     <?php endif; ?>
 
