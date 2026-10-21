@@ -4,9 +4,9 @@
 // Edit customer record
 // ============================================================
 
-require_once __DIR__ . '/../../../includes/auth-guard.php';
-require_once __DIR__ . '/../../../config/db.php';
-require_once __DIR__ . '/../../../helpers/audit-helper.php';
+require_once __DIR__ . '/../../includes/auth-guard.php';
+require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../helpers/audit-helper.php';
 
 $pageTitle  = 'Edit Customer';
 $activePage = 'customers';
@@ -87,8 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require_once __DIR__ . '/../../../includes/header.php';
-require_once __DIR__ . '/../../../includes/sidebar.php';
+require_once __DIR__ . '/../../includes/header.php';
+require_once __DIR__ . '/../../includes/sidebar.php';
 ?>
 
 <div class="main-content">
@@ -169,4 +169,4 @@ require_once __DIR__ . '/../../../includes/sidebar.php';
   </div>
 </div>
 
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../../includes/footer.php'; ?>

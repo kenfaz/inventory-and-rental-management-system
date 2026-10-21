@@ -4,9 +4,9 @@
 // Add new customer record
 // ============================================================
 
-require_once __DIR__ . '/../../../includes/auth-guard.php';
-require_once __DIR__ . '/../../../config/db.php';
-require_once __DIR__ . '/../../../helpers/audit-helper.php';
+require_once __DIR__ . '/../../includes/auth-guard.php';
+require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../helpers/audit-helper.php';
 
 $pageTitle  = 'Add Customer';
 $activePage = 'customers';
@@ -58,8 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require_once __DIR__ . '/../../../includes/header.php';
-require_once __DIR__ . '/../../../includes/sidebar.php';
+require_once __DIR__ . '/../../includes/header.php';
+require_once __DIR__ . '/../../includes/sidebar.php';
 ?>
 
 <div class="main-content">
@@ -102,7 +102,7 @@ require_once __DIR__ . '/../../../includes/sidebar.php';
                   Mobile Number <span class="text-danger">*</span>
                 </label>
                 <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                  <span class="input-group-text bg-transparent text-primary"><i class="bi bi-phone"></i></span>
                   <input type="text" name="mobile_number"
                          class="form-control <?= isset($errors['mobile_number']) ? 'is-invalid' : '' ?>"
                          placeholder="09XXXXXXXXX"
@@ -138,4 +138,4 @@ require_once __DIR__ . '/../../../includes/sidebar.php';
   </div>
 </div>
 
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../../includes/footer.php'; ?>

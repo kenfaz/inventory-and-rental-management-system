@@ -47,6 +47,9 @@ date_default_timezone_set(APP_TIMEZONE);
 // ── Password Policy ──────────────────────────────────────────
 define('PASSWORD_MIN_LENGTH',    8);
 define('RESET_TOKEN_EXPIRY_MIN', 30); // minutes
+define('LOGIN_MAX_ATTEMPTS',     5);
+define('LOGIN_ATTEMPT_WINDOW_MINUTES', 15);
+define('LOGIN_COOLDOWN_MINUTES', 15);
 
 // ── Rental Agreement ─────────────────────────────────────────
 define('SHOP_NAME',    "Desire's Tailor Shop");

@@ -4,9 +4,9 @@
 // Customer profile and full transaction history
 // ============================================================
 
-require_once __DIR__ . '/../../../includes/auth-guard.php';
-require_once __DIR__ . '/../../../config/db.php';
-require_once __DIR__ . '/../../../helpers/rental-helper.php';
+require_once __DIR__ . '/../../includes/auth-guard.php';
+require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../helpers/rental-helper.php';
 
 $pageTitle  = 'Customer Profile';
 $activePage = 'customers';
@@ -79,8 +79,8 @@ $totalSpent = array_sum(array_column($sales, 'amount'));
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success'], $_SESSION['error']);
 
-require_once __DIR__ . '/../../../includes/header.php';
-require_once __DIR__ . '/../../../includes/sidebar.php';
+require_once __DIR__ . '/../../includes/header.php';
+require_once __DIR__ . '/../../includes/sidebar.php';
 ?>
 
 <div class="main-content">
@@ -348,4 +348,4 @@ require_once __DIR__ . '/../../../includes/sidebar.php';
   </div>
 </div>
 
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../../includes/footer.php'; ?>

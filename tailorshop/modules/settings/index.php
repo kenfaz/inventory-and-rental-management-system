@@ -211,6 +211,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                 'users','customers','material_items','garment_items',
                 'reservations','rentals','tailoring_orders',
                 'sales_records','income_records','sms_logs','audit_logs','login_logs',
+                'login_attempts',
             ];
             ?>
             <div class="row g-2">
