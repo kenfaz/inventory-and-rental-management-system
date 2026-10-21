@@ -22,6 +22,7 @@ $values = [
     'item_name'           => '',
     'brand'               => '',
     'quantity'            => '',
+    'sale_price'          => '',
     'unit'                => 'piece',
     'low_stock_threshold' => DEFAULT_LOW_STOCK_THRESHOLD,
     'description'         => '',
@@ -33,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'item_name'           => trim($_POST['item_name']           ?? ''),
         'brand'               => trim($_POST['brand']               ?? ''),
         'quantity'            => trim($_POST['quantity']            ?? ''),
+        'sale_price'          => trim($_POST['sale_price']          ?? ''),
         'unit'                => trim($_POST['unit']                ?? 'piece'),
         'low_stock_threshold' => trim($_POST['low_stock_threshold'] ?? DEFAULT_LOW_STOCK_THRESHOLD),
         'description'         => trim($_POST['description']         ?? ''),
@@ -45,6 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['item_name'] = 'Item name is required.';
     if (!is_numeric($values['quantity']) || (float)$values['quantity'] < 0)
         $errors['quantity'] = 'Quantity must be 0 or more.';
+    if ($values['sale_price'] !== '' && (!is_numeric($values['sale_price']) || (float)$values['sale_price'] < 0))
+        $errors['sale_price'] = 'Sale price must be a valid amount of 0 or more.';
     if ($values['unit'] === '')
         $errors['unit'] = 'Unit is required.';
     if (!is_numeric($values['low_stock_threshold']) || (float)$values['low_stock_threshold'] < 0)
@@ -53,14 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         $pdo->prepare('
             INSERT INTO material_items
-                (category_id, item_name, brand, quantity,
+                (category_id, item_name, brand, quantity, sale_price,
                  unit, low_stock_threshold, description)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ')->execute([
             (int)$values['category_id'],
             $values['item_name'],
             $values['brand']       ?: null,
             (float)$values['quantity'],
+            $values['sale_price'] !== '' ? (float)$values['sale_price'] : null,
             $values['unit'],
             (float)$values['low_stock_threshold'],
             $values['description'] ?: null,
@@ -184,6 +189,18 @@ require_once __DIR__ . '/../../../includes/sidebar.php';
                     <div class="invalid-feedback"><?= $errors['unit'] ?></div>
                   <?php endif; ?>
                 </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Sale Price per Unit (₱)</label>
+                <input type="number" name="sale_price" step="0.01" min="0"
+                       class="form-control <?= isset($errors['sale_price']) ? 'is-invalid' : '' ?>"
+                       value="<?= htmlspecialchars($values['sale_price']) ?>"
+                       placeholder="Leave blank if this item is not for sale">
+                <div class="form-text">Set the catalog price used by the sales operation.</div>
+                <?php if (isset($errors['sale_price'])): ?>
+                  <div class="invalid-feedback"><?= $errors['sale_price'] ?></div>
+                <?php endif; ?>
               </div>
 
               <!-- Low stock threshold -->

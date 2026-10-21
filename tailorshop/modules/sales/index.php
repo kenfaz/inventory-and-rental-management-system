@@ -63,7 +63,7 @@ foreach ($records as $r) {
     $totalByMethod[$r['payment_method']] = ($totalByMethod[$r['payment_method']] ?? 0) + $r['amount'];
 }
 
-$types   = ['Garment Sale','Rental Fee','Tailoring Payment'];
+$types   = ['Garment Sale','Material Sale','Rental Fee','Tailoring Payment'];
 $methods = ['Cash','GCash','Card','Other'];
 
 $success = $_SESSION['success'] ?? '';
@@ -116,6 +116,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
         <?php
         $typeColors = [
             'Garment Sale'      => ['bg'=>'#FEF3C7','color'=>'#92400E'],
+            'Material Sale'     => ['bg'=>'#CFFAFE','color'=>'#0E7490'],
             'Rental Fee'        => ['bg'=>'#EFF6FF','color'=>'#1D4ED8'],
             'Tailoring Payment' => ['bg'=>'#EDE9FE','color'=>'#5B21B6'],
         ];
@@ -202,6 +203,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
               <?php foreach ($records as $r):
                 $typeColors = [
                     'Garment Sale'      => 'bg-warning bg-opacity-10 text-warning',
+                    'Material Sale'     => 'bg-info bg-opacity-10 text-info',
                     'Rental Fee'        => 'bg-primary bg-opacity-10 text-primary',
                     'Tailoring Payment' => 'bg-purple bg-opacity-10',
                 ];
@@ -226,6 +228,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                     <?php
                     $typeBadge = [
                         'Garment Sale'      => ['bg'=>'#FEF3C7','color'=>'#92400E'],
+                        'Material Sale'     => ['bg'=>'#CFFAFE','color'=>'#0E7490'],
                         'Rental Fee'        => ['bg'=>'#EFF6FF','color'=>'#1D4ED8'],
                         'Tailoring Payment' => ['bg'=>'#EDE9FE','color'=>'#5B21B6'],
                     ];

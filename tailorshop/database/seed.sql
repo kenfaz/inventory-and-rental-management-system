@@ -61,26 +61,27 @@ INSERT INTO garment_categories (category_name, description) VALUES
 -- ============================================================
 -- SAMPLE MATERIAL ITEMS
 -- ============================================================
-INSERT INTO material_items (category_id, item_name, brand, quantity, unit, low_stock_threshold) VALUES
-(1, 'White Satin Fabric',        'Generic',  50.00, 'meter', 10.00),
-(1, 'Ivory Lace Fabric',         'Generic',  30.00, 'meter', 8.00),
-(1, 'Royal Blue Chiffon',        'Generic',  25.00, 'meter', 5.00),
-(1, 'Black Velvet Fabric',       'Generic',  20.00, 'meter', 5.00),
-(2, 'White Polyester Thread',    'Coats',   100.00, 'spool', 10.00),
-(2, 'Black Polyester Thread',    'Coats',    80.00, 'spool', 10.00),
-(2, 'Gold Embroidery Floss',     'DMC',      50.00, 'spool', 5.00),
-(3, 'White Lining Fabric',       'Generic',  40.00, 'meter', 8.00),
-(3, 'Fusible Interfacing',       'Pellon',   20.00, 'meter', 5.00),
-(4, 'Invisible Zipper 20cm',     'YKK',     100.00, 'piece', 15.00),
-(4, 'Pearl Buttons Set',         'Generic',  200.00,'piece', 30.00),
-(4, 'Metal Hook and Eye Set',    'Generic',  150.00,'piece', 20.00),
-(5, 'White Lace Trim',           'Generic',  30.00, 'meter', 5.00),
-(5, 'Gold Ribbon 1.5cm',         'Generic',  25.00, 'meter', 5.00),
-(6, 'Elastic Band 2cm',          'Generic',  20.00, 'meter', 5.00),
-(6, 'White Bias Tape',           'Generic',  15.00, 'meter', 3.00),
-(7, 'Sewing Needles Pack',       'Singer',   30.00, 'pack',  5.00),
-(7, 'Tailor\'s Chalk White',     'Generic',  20.00, 'piece', 5.00),
-(7, 'Glass Head Pins Box',       'Generic',  15.00, 'box',   3.00);
+INSERT INTO material_items
+  (category_id, item_name, brand, quantity, sale_price, unit, low_stock_threshold) VALUES
+(1, 'White Satin Fabric',        'Generic',  50.00, 1200.00, 'meter', 10.00),
+(1, 'Ivory Lace Fabric',         'Generic',  30.00, 1800.00, 'meter', 8.00),
+(1, 'Royal Blue Chiffon',        'Generic',  25.00,  650.00, 'meter', 5.00),
+(1, 'Black Velvet Fabric',       'Generic',  20.00, 1600.00, 'meter', 5.00),
+(2, 'White Polyester Thread',    'Coats',   100.00,   80.00, 'spool', 10.00),
+(2, 'Black Polyester Thread',    'Coats',    80.00,   80.00, 'spool', 10.00),
+(2, 'Gold Embroidery Floss',     'DMC',      50.00,   65.00, 'spool', 5.00),
+(3, 'White Lining Fabric',       'Generic',  40.00,  350.00, 'meter', 8.00),
+(3, 'Fusible Interfacing',       'Pellon',   20.00,  280.00, 'meter', 5.00),
+(4, 'Invisible Zipper 20cm',     'YKK',     100.00,   45.00, 'piece', 15.00),
+(4, 'Pearl Buttons Set',         'Generic',  200.00,   12.00, 'piece', 30.00),
+(4, 'Metal Hook and Eye Set',    'Generic',  150.00,   10.00, 'piece', 20.00),
+(5, 'White Lace Trim',           'Generic',  30.00,  180.00, 'meter', 5.00),
+(5, 'Gold Ribbon 1.5cm',         'Generic',  25.00,   95.00, 'meter', 5.00),
+(6, 'Elastic Band 2cm',          'Generic',  20.00,   45.00, 'meter', 5.00),
+(6, 'White Bias Tape',           'Generic',  15.00,   40.00, 'meter', 3.00),
+(7, 'Sewing Needles Pack',       'Singer',   30.00,  120.00, 'pack',  5.00),
+(7, 'Tailor\'s Chalk White',     'Generic',  20.00,   25.00, 'piece', 5.00),
+(7, 'Glass Head Pins Box',       'Generic',  15.00,  150.00, 'box',   3.00);
 
 -- ============================================================
 -- SAMPLE GARMENT ITEMS

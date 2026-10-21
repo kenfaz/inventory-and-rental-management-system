@@ -85,6 +85,7 @@ CREATE TABLE material_items (
   item_name           VARCHAR(100)  NOT NULL,
   brand               VARCHAR(100)  NULL,
   quantity            DECIMAL(10,2) NOT NULL DEFAULT 0,
+  sale_price          DECIMAL(10,2) NULL,
   unit                VARCHAR(30)   NOT NULL DEFAULT 'piece',
   low_stock_threshold DECIMAL(10,2) NOT NULL DEFAULT 5,
   description         VARCHAR(255)  NULL,
@@ -342,10 +343,12 @@ CREATE TABLE sales_records (
   customer_id    INT           NOT NULL,
   processed_by   INT           NOT NULL,
   garment_id     INT           NULL,
+  material_id    INT           NULL,
   rental_id      INT           NULL,
   order_id       INT           NULL,
   sale_type      ENUM(
                    'Garment Sale',
+                   'Material Sale',
                    'Rental Fee',
                    'Tailoring Payment'
                  ) NOT NULL,
@@ -367,6 +370,10 @@ CREATE TABLE sales_records (
     FOREIGN KEY (garment_id)
     REFERENCES garment_items (garment_id)
     ON UPDATE CASCADE ON DELETE SET NULL,
+  CONSTRAINT fk_sale_material
+    FOREIGN KEY (material_id)
+    REFERENCES material_items (item_id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
   CONSTRAINT fk_sale_rental
     FOREIGN KEY (rental_id)
     REFERENCES rentals (rental_id)
@@ -386,6 +393,7 @@ CREATE TABLE income_records (
   sale_id        INT           NOT NULL UNIQUE,
   income_type    ENUM(
                    'Garment Sale',
+                   'Material Sale',
                    'Rental Fee',
                    'Tailoring Payment'
                  ) NOT NULL,

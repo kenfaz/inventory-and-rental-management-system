@@ -111,6 +111,12 @@ function navActive(string $page, string $current): string {
         <i class="bi bi-thread"></i> Tailoring Orders
       </a>
     </li>
+    <li>
+      <a href="/tailorshop/modules/sales/sell.php"
+         class="<?= navActive('sell-items', $activePage) ?>">
+        <i class="bi bi-cart-plus"></i> Sell Items
+      </a>
+    </li>
   </ul>
 
   <!-- Admin-only sections -->

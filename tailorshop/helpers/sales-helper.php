@@ -11,7 +11,7 @@ require_once __DIR__ . '/audit-helper.php';
  *
  * @param int    $customerId    customers.customer_id
  * @param int    $processedBy  users.user_id
- * @param string $saleType     'Garment Sale' | 'Rental Fee' | 'Tailoring Payment'
+ * @param string $saleType     'Garment Sale' | 'Material Sale' | 'Rental Fee' | 'Tailoring Payment'
  * @param float  $amount       Amount in PHP peso
  * @param string $paymentMethod 'Cash' | 'GCash' | 'Card' | 'Other'
  * @param int|null $garmentId  garment_items.garment_id (if sale)
@@ -19,6 +19,7 @@ require_once __DIR__ . '/audit-helper.php';
  * @param int|null $orderId    tailoring_orders.order_id (if tailoring)
  * @param string|null $paymentOther Specify if payment_method is Other
  * @param string|null $notes   Optional notes
+ * @param int|null $materialId material_items.item_id (if material sale)
  * @return int  The new sale_id
  */
 function recordSale(
@@ -31,19 +32,20 @@ function recordSale(
     ?int   $rentalId      = null,
     ?int   $orderId       = null,
     ?string $paymentOther = null,
-    ?string $notes        = null
+    ?string $notes        = null,
+    ?int    $materialId   = null
 ): int {
     global $pdo;
 
     // Insert sales record
     $pdo->prepare('
         INSERT INTO sales_records
-            (customer_id, processed_by, garment_id, rental_id, order_id,
+            (customer_id, processed_by, garment_id, material_id, rental_id, order_id,
              sale_type, amount, payment_method, payment_other, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ')->execute([
         $customerId, $processedBy,
-        $garmentId, $rentalId, $orderId,
+        $garmentId, $materialId, $rentalId, $orderId,
         $saleType, $amount, $paymentMethod, $paymentOther, $notes,
     ]);
 
@@ -61,6 +63,7 @@ function recordSale(
         'sale_type'      => $saleType,
         'amount'         => $amount,
         'payment_method' => $paymentMethod,
+        'material_id'    => $materialId,
     ]);
 
     return $saleId;

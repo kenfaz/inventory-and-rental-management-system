@@ -140,6 +140,7 @@ require_once __DIR__ . '/../../../includes/sidebar.php';
               <th>Category</th>
               <th>Quantity</th>
               <th>Unit</th>
+              <th>Sale Price</th>
               <th>Threshold</th>
               <th>Status</th>
               <?php if ($role === 'admin'): ?>
@@ -150,7 +151,7 @@ require_once __DIR__ . '/../../../includes/sidebar.php';
           <tbody>
             <?php if (empty($items)): ?>
               <tr>
-                <td colspan="<?= $role === 'admin' ? 8 : 7 ?>"
+                <td colspan="<?= $role === 'admin' ? 9 : 8 ?>"
                     class="text-center text-muted py-5">
                   <i class="bi bi-box-seam fs-3 d-block mb-2"></i>
                   <?= $search || $categoryId ? 'No items matched your search.' : 'No material items yet.' ?>
@@ -176,6 +177,11 @@ require_once __DIR__ . '/../../../includes/sidebar.php';
                     </span>
                   </td>
                   <td><?= htmlspecialchars($item['unit']) ?></td>
+                  <td>
+                    <?= $item['sale_price'] !== null
+                        ? '₱' . number_format((float)$item['sale_price'], 2)
+                        : '<span class="text-muted">Not for sale</span>' ?>
+                  </td>
                   <td class="text-muted">
                     <?= rtrim(rtrim(number_format($item['low_stock_threshold'], 2), '0'), '.') ?>
                     <?= htmlspecialchars($item['unit']) ?>

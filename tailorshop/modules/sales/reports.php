@@ -101,7 +101,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 
     <!-- Summary cards -->
     <div class="row g-3 mb-4">
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg">
         <div class="stat-card" style="border-left:3px solid #10B981">
           <div class="stat-icon" style="background:#F0FDF4;color:#166534">
             <i class="bi bi-cash-stack"></i>
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
           </div>
         </div>
       </div>
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg">
         <div class="stat-card" style="border-left:3px solid #92400E">
           <div class="stat-icon" style="background:#FEF3C7;color:#92400E">
             <i class="bi bi-bag-heart"></i>
@@ -131,7 +131,24 @@ require_once __DIR__ . '/../../includes/sidebar.php';
           </div>
         </div>
       </div>
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg">
+        <div class="stat-card" style="border-left:3px solid #0E7490">
+          <div class="stat-icon" style="background:#CFFAFE;color:#0E7490">
+            <i class="bi bi-box-seam"></i>
+          </div>
+          <div>
+            <div class="stat-label">Material Sales</div>
+            <div class="stat-value" style="font-size:20px;color:#0E7490">
+              ₱<?= number_format(
+                    array_sum(array_map(
+                        fn($r) => $r['income_type'] === 'Material Sale' ? $r['amount'] : 0,
+                        $report['records']
+                    )), 2) ?>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg">
         <div class="stat-card" style="border-left:3px solid #1D4ED8">
           <div class="stat-icon" style="background:#EFF6FF;color:#1D4ED8">
             <i class="bi bi-handbag"></i>
@@ -148,7 +165,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
           </div>
         </div>
       </div>
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg">
         <div class="stat-card" style="border-left:3px solid #5B21B6">
           <div class="stat-icon" style="background:#EDE9FE;color:#5B21B6">
             <i class="bi bi-scissors"></i>
