@@ -43,7 +43,7 @@ uses PHPMailer and the local Mailpit SMTP service by default:
   Live SMS requests can incur charges; email remains local to Mailpit with
   the default configuration.
 
-  # SMS Mobile View
+  ## SMS Mobile View
 <img width="1267" height="672" alt="image" src="https://github.com/user-attachments/assets/e8cbf52d-87db-4fb2-a11c-4e0f30751564" />
 
 
