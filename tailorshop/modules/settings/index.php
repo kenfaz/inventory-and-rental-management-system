@@ -115,16 +115,16 @@ require_once __DIR__ . '/../../includes/sidebar.php';
               Edit that file directly to change them.
             </p>
             <dl class="row mb-0" style="font-size:13.5px">
-              <dt class="col-6 text-muted fw-normal">Semaphore API Key</dt>
+              <dt class="col-6 text-muted fw-normal">UniSMS Secret Key</dt>
               <dd class="col-6 fw-medium" style="font-family:monospace">
-                <?= defined('SEMAPHORE_API_KEY') && SEMAPHORE_API_KEY !== 'YOUR_SEMAPHORE_API_KEY_HERE'
-                    ? '••••••••' . substr(SEMAPHORE_API_KEY, -6)
+                <?= defined('UNISMS_SECRET_KEY') && UNISMS_SECRET_KEY !== 'YOUR_UNISMS_SECRET_KEY_HERE'
+                    ? '••••••••' . substr(UNISMS_SECRET_KEY, -6)
                     : '<span class="text-danger">Not configured</span>' ?>
               </dd>
-              <dt class="col-6 text-muted fw-normal">Sender Name</dt>
+              <dt class="col-6 text-muted fw-normal">Sender ID</dt>
               <dd class="col-6 fw-medium">
-                <?= defined('SEMAPHORE_SENDER_NAME')
-                    ? htmlspecialchars(SEMAPHORE_SENDER_NAME)
+                <?= defined('UNISMS_SENDER_ID') && UNISMS_SENDER_ID !== 'YOUR_UNISMS_SENDER_ID_HERE'
+                    ? htmlspecialchars(UNISMS_SENDER_ID)
                     : '<span class="text-danger">Not configured</span>' ?>
               </dd>
               <dt class="col-6 text-muted fw-normal">Admin SMS Number</dt>

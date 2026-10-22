@@ -12,10 +12,14 @@ uses PHPMailer and the local Mailpit SMTP service by default:
   `http://127.0.0.1:8025`.
 - Override `MAIL_SMTP_HOST`, `MAIL_SMTP_PORT`, `MAIL_FROM_ADDRESS`, and
   `MAIL_FROM_NAME` in the environment to use a different SMTP server.
+- Copy the root `.env.example` to `.env` and add your UniSMS secret key and
+  sender ID. The local `.env` file is ignored by Git; operating-system
+  environment variables take precedence over values in that file.
 - Existing databases must run `tailorshop/database/migrate-email-notifications.sql`
   once before using email notifications.
 - New customers must have a valid email address. Legacy customer records may
   keep an empty email; those customers continue to receive SMS only.
-- SMS still requires valid Semaphore credentials and an admin phone number in
-  `tailorshop/config/constants.php`. Running the scheduler can make real SMS
-  requests; email remains local to Mailpit with the default configuration.
+- SMS uses UniSMS. Configure `UNISMS_SECRET_KEY` and `UNISMS_SENDER_ID` in
+  `.env` and set the admin phone number in `tailorshop/config/constants.php`.
+  Running the scheduler can make real SMS requests; email remains local to
+  Mailpit with the default configuration.

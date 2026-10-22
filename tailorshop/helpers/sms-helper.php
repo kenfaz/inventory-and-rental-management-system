@@ -1,14 +1,14 @@
 <?php
 // ============================================================
 // helpers/sms-helper.php
-// Sends SMS via Semaphore API and logs delivery result
+// Sends SMS via UniSMS API and logs delivery result
 // ============================================================
 
 require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../config/db.php';
 
 /**
- * Send an SMS via Semaphore API
+ * Send an SMS via UniSMS API
  *
  * @param string $number        Recipient mobile number (e.g. 09171234567)
  * @param string $message       Message content
@@ -30,18 +30,43 @@ function sendSMS(
     $failureReason = null;
 
     try {
-        $ch = curl_init();
+        if (
+            UNISMS_SECRET_KEY === 'YOUR_UNISMS_SECRET_KEY_HERE' ||
+            UNISMS_SECRET_KEY === '' ||
+            UNISMS_SENDER_ID === 'YOUR_UNISMS_SENDER_ID_HERE' ||
+            UNISMS_SENDER_ID === ''
+        ) {
+            throw new RuntimeException('UniSMS secret key and sender ID must be configured.');
+        }
+
+        $recipient = trim($number);
+        if (preg_match('/^09\d{9}$/', $recipient)) {
+            $recipient = '+63' . substr($recipient, 1);
+        } elseif (preg_match('/^639\d{9}$/', $recipient)) {
+            $recipient = '+' . $recipient;
+        } elseif (!preg_match('/^\+639\d{9}$/', $recipient)) {
+            throw new InvalidArgumentException('Recipient must be a valid Philippine mobile number.');
+        }
+
+        $payload = json_encode([
+            'recipient' => $recipient,
+            'content' => $message,
+            'sender_id' => UNISMS_SENDER_ID,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+
+        $ch = curl_init(UNISMS_API_URL);
+        if ($ch === false) {
+            throw new RuntimeException('Could not initialize the UniSMS request.');
+        }
+
         curl_setopt_array($ch, [
-            CURLOPT_URL            => SEMAPHORE_API_URL,
             CURLOPT_POST           => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT        => 30,
-            CURLOPT_POSTFIELDS     => http_build_query([
-                'apikey'      => SEMAPHORE_API_KEY,
-                'number'      => $number,
-                'message'     => $message,
-                'sendername'  => SEMAPHORE_SENDER_NAME,
-            ]),
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPAUTH       => CURLAUTH_BASIC,
+            CURLOPT_USERPWD        => UNISMS_SECRET_KEY . ':',
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
         ]);
 
         $response = curl_exec($ch);
@@ -49,22 +74,19 @@ function sendSMS(
         $curlError = curl_error($ch);
         curl_close($ch);
 
-        if ($curlError) {
+        if ($response === false || $curlError !== '') {
             $failureReason = 'cURL error: ' . $curlError;
-        } elseif ($httpCode === 200) {
-            $data = json_decode($response, true);
-            // Semaphore returns array of message objects on success
-            if (is_array($data) && !empty($data)) {
-                $status = 'Sent';
-            } else {
-                $failureReason = 'Unexpected API response: ' . $response;
-            }
+        } elseif ($httpCode >= 200 && $httpCode < 300) {
+            $status = 'Sent';
         } else {
             $failureReason = 'HTTP ' . $httpCode . ': ' . $response;
         }
 
     } catch (Throwable $e) {
         $failureReason = 'Exception: ' . $e->getMessage();
+    }
+    if ($failureReason !== null) {
+        $failureReason = substr($failureReason, 0, 255);
     }
 
     // Log the SMS attempt
@@ -83,7 +105,7 @@ function sendSMS(
             $status,
             $failureReason,
         ]);
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         error_log('SMS log error: ' . $e->getMessage());
     }
 
