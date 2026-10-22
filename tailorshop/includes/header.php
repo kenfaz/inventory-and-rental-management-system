@@ -28,6 +28,9 @@ $pageTitle = $pageTitle ?? "Desire's Tailor Shop";
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <!-- Global styles -->
   <link href="/tailorshop/assets/css/main.css" rel="stylesheet">
+  <?php if (!empty($pageStylesheet)): ?>
+    <link href="<?= htmlspecialchars($pageStylesheet) ?>" rel="stylesheet">
+  <?php endif; ?>
 </head>
 <body>
 <div class="wrapper"></div>

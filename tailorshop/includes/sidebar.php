@@ -164,6 +164,12 @@ function navActive(string $page, string $current): string {
         </a>
       </li>
       <li>
+        <a href="/tailorshop/modules/logs/sms-simulator.php"
+           class="<?= navActive('sms-simulator', $activePage) ?>">
+          <i class="bi bi-phone"></i> SMS Simulator
+        </a>
+      </li>
+      <li>
         <a href="/tailorshop/modules/logs/email-logs.php"
            class="<?= navActive('email-logs', $activePage) ?>">
           <i class="bi bi-envelope"></i> Email Logs

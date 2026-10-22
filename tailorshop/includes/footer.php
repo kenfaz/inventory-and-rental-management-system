@@ -6,5 +6,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Global scripts -->
 <script src="/tailorshop/assets/css/../js/main.js"></script>
+<?php if (!empty($pageScript)): ?>
+<script src="<?= htmlspecialchars($pageScript) ?>"></script>
+<?php endif; ?>
 </body>
 </html>

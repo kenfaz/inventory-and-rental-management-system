@@ -110,11 +110,17 @@ require_once __DIR__ . '/../../includes/sidebar.php';
           </div>
           <div class="card-body p-4">
             <p class="text-muted small mb-3">
-              These settings are configured in
-              <code>config/constants.php</code>.
-              Edit that file directly to change them.
+              SMS credentials are read from the project root
+              <code>.env</code> file. The admin number and reminder schedule
+              are configured in <code>config/constants.php</code>.
             </p>
             <dl class="row mb-0" style="font-size:13.5px">
+              <dt class="col-6 text-muted fw-normal">SMS Mode</dt>
+              <dd class="col-6 fw-medium">
+                <?= SMS_MOCK_MODE
+                    ? '<span class="text-info">Mock — no SMS sent</span>'
+                    : '<span class="text-warning">Live — SMS may incur charges</span>' ?>
+              </dd>
               <dt class="col-6 text-muted fw-normal">UniSMS Secret Key</dt>
               <dd class="col-6 fw-medium" style="font-family:monospace">
                 <?= defined('UNISMS_SECRET_KEY') && UNISMS_SECRET_KEY !== 'YOUR_UNISMS_SECRET_KEY_HERE'

@@ -88,7 +88,9 @@ try {
         auditStatusChange($_SESSION['user_id'], 'Tailoring Orders',
                           'tailoring_orders', $orderId, $oldStatus, $newStatus);
 
-        $_SESSION['success'] = 'Order marked Ready for Pickup. SMS sent to customer.';
+        $_SESSION['success'] = SMS_MOCK_MODE
+            ? 'Order marked Ready for Pickup. SMS simulated (not sent).'
+            : 'Order marked Ready for Pickup. SMS sent to customer.';
         header('Location: /tailorshop/modules/tailoring/view.php?id=' . $orderId);
         exit;
     }

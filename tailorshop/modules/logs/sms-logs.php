@@ -47,6 +47,7 @@ $logs = $stmt->fetchAll();
 
 $sentCount   = count(array_filter($logs, fn($l) => $l['status'] === 'Sent'));
 $failedCount = count(array_filter($logs, fn($l) => $l['status'] === 'Failed'));
+$mockedCount = count(array_filter($logs, fn($l) => $l['status'] === 'Mocked'));
 
 $triggerTypes = [
     'Reservation Confirmation',
@@ -73,6 +74,8 @@ require_once __DIR__ . '/../../includes/sidebar.php';
         <p class="text-muted small mb-0">
           <?= count($logs) ?> records &nbsp;·&nbsp;
           <span class="text-success fw-medium"><?= $sentCount ?> sent</span>
+          &nbsp;·&nbsp;
+          <span class="text-info fw-medium"><?= $mockedCount ?> mocked</span>
           &nbsp;·&nbsp;
           <span class="text-danger fw-medium"><?= $failedCount ?> failed</span>
         </p>
@@ -103,6 +106,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                   style="width:auto" onchange="this.form.submit()">
             <option value="">All Statuses</option>
             <option value="Sent"   <?= $statusFilter === 'Sent'   ? 'selected' : '' ?>>Sent</option>
+            <option value="Mocked" <?= $statusFilter === 'Mocked' ? 'selected' : '' ?>>Mocked</option>
             <option value="Failed" <?= $statusFilter === 'Failed' ? 'selected' : '' ?>>Failed</option>
           </select>
           <div class="d-flex align-items-center gap-1" style="font-size:12.5px">
@@ -170,6 +174,10 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                     <?php if ($log['status'] === 'Sent'): ?>
                       <span class="badge-status badge-active">
                         <i class="bi bi-check-circle-fill" style="font-size:8px"></i> Sent
+                      </span>
+                    <?php elseif ($log['status'] === 'Mocked'): ?>
+                      <span class="badge bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-shield-check" style="font-size:8px"></i> Mocked — not sent
                       </span>
                     <?php else: ?>
                       <span class="badge-status badge-overdue">

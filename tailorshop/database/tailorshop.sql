@@ -476,7 +476,7 @@ CREATE TABLE sms_logs (
                  ) NOT NULL,
   reference_id   INT          NULL,
   reference_type VARCHAR(50)  NULL,
-  status         ENUM('Sent','Failed') NOT NULL DEFAULT 'Sent',
+  status         ENUM('Sent','Failed','Mocked') NOT NULL DEFAULT 'Sent',
   failure_reason VARCHAR(255) NULL,
   timestamp      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (sms_log_id)

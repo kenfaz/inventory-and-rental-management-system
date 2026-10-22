@@ -15,7 +15,7 @@ require_once __DIR__ . '/../config/db.php';
  * @param string $triggerType   One of the ENUM values in sms_logs.trigger_type
  * @param int|null $referenceId ID of the related record (rental_id, order_id, etc.)
  * @param string|null $referenceType Name of the related table
- * @return bool True if sent successfully, false otherwise
+ * @return bool True if sent or simulated successfully, false otherwise
  */
 function sendSMS(
     string $number,
@@ -30,56 +30,60 @@ function sendSMS(
     $failureReason = null;
 
     try {
-        if (
-            UNISMS_SECRET_KEY === 'YOUR_UNISMS_SECRET_KEY_HERE' ||
-            UNISMS_SECRET_KEY === '' ||
-            UNISMS_SENDER_ID === 'YOUR_UNISMS_SENDER_ID_HERE' ||
-            UNISMS_SENDER_ID === ''
-        ) {
-            throw new RuntimeException('UniSMS secret key and sender ID must be configured.');
-        }
-
-        $recipient = trim($number);
-        if (preg_match('/^09\d{9}$/', $recipient)) {
-            $recipient = '+63' . substr($recipient, 1);
-        } elseif (preg_match('/^639\d{9}$/', $recipient)) {
-            $recipient = '+' . $recipient;
-        } elseif (!preg_match('/^\+639\d{9}$/', $recipient)) {
-            throw new InvalidArgumentException('Recipient must be a valid Philippine mobile number.');
-        }
-
-        $payload = json_encode([
-            'recipient' => $recipient,
-            'content' => $message,
-            'sender_id' => UNISMS_SENDER_ID,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
-
-        $ch = curl_init(UNISMS_API_URL);
-        if ($ch === false) {
-            throw new RuntimeException('Could not initialize the UniSMS request.');
-        }
-
-        curl_setopt_array($ch, [
-            CURLOPT_POST           => true,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 30,
-            CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_HTTPAUTH       => CURLAUTH_BASIC,
-            CURLOPT_USERPWD        => UNISMS_SECRET_KEY . ':',
-            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-
-        if ($response === false || $curlError !== '') {
-            $failureReason = 'cURL error: ' . $curlError;
-        } elseif ($httpCode >= 200 && $httpCode < 300) {
-            $status = 'Sent';
+        if (SMS_MOCK_MODE) {
+            $status = 'Mocked';
         } else {
-            $failureReason = 'HTTP ' . $httpCode . ': ' . $response;
+            if (
+                UNISMS_SECRET_KEY === 'YOUR_UNISMS_SECRET_KEY_HERE' ||
+                UNISMS_SECRET_KEY === '' ||
+                UNISMS_SENDER_ID === 'YOUR_UNISMS_SENDER_ID_HERE' ||
+                UNISMS_SENDER_ID === ''
+            ) {
+                throw new RuntimeException('UniSMS secret key and sender ID must be configured.');
+            }
+
+            $recipient = trim($number);
+            if (preg_match('/^09\d{9}$/', $recipient)) {
+                $recipient = '+63' . substr($recipient, 1);
+            } elseif (preg_match('/^639\d{9}$/', $recipient)) {
+                $recipient = '+' . $recipient;
+            } elseif (!preg_match('/^\+639\d{9}$/', $recipient)) {
+                throw new InvalidArgumentException('Recipient must be a valid Philippine mobile number.');
+            }
+
+            $payload = json_encode([
+                'recipient' => $recipient,
+                'content' => $message,
+                'sender_id' => UNISMS_SENDER_ID,
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+
+            $ch = curl_init(UNISMS_API_URL);
+            if ($ch === false) {
+                throw new RuntimeException('Could not initialize the UniSMS request.');
+            }
+
+            curl_setopt_array($ch, [
+                CURLOPT_POST           => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT        => 30,
+                CURLOPT_POSTFIELDS     => $payload,
+                CURLOPT_HTTPAUTH       => CURLAUTH_BASIC,
+                CURLOPT_USERPWD        => UNISMS_SECRET_KEY . ':',
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false || $curlError !== '') {
+                $failureReason = 'cURL error: ' . $curlError;
+            } elseif ($httpCode >= 200 && $httpCode < 300) {
+                $status = 'Sent';
+            } else {
+                $failureReason = 'HTTP ' . $httpCode . ': ' . $response;
+            }
         }
 
     } catch (Throwable $e) {
@@ -109,7 +113,7 @@ function sendSMS(
         error_log('SMS log error: ' . $e->getMessage());
     }
 
-    return $status === 'Sent';
+    return in_array($status, ['Sent', 'Mocked'], true);
 }
 
 function smsAttemptedToday(

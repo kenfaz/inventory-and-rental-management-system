@@ -54,6 +54,8 @@ define('APP_URL',     'http://localhost/tailorshop');
 define('UNISMS_SECRET_KEY', getenv('UNISMS_SECRET_KEY') ?: 'YOUR_UNISMS_SECRET_KEY_HERE');
 define('UNISMS_SENDER_ID', getenv('UNISMS_SENDER_ID') ?: 'YOUR_UNISMS_SENDER_ID_HERE');
 define('UNISMS_API_URL', getenv('UNISMS_API_URL') ?: 'https://unismsapi.com/api/sms');
+$smsMockMode = getenv('SMS_MOCK_MODE');
+define('SMS_MOCK_MODE', filter_var($smsMockMode === false ? 'true' : $smsMockMode, FILTER_VALIDATE_BOOLEAN));
 
 // ── Local email delivery (Mailpit) ───────────────────────────
 define('MAIL_SMTP_HOST', getenv('MAIL_SMTP_HOST') ?: '127.0.0.1');

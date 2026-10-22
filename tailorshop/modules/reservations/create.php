@@ -127,7 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         $_SESSION['success'] = 'Reservation #' . str_pad($resId, 4, '0', STR_PAD_LEFT) .
-                               ' created and confirmation SMS sent.';
+                               (SMS_MOCK_MODE
+                                   ? ' created; confirmation SMS simulated (not sent).'
+                                   : ' created and confirmation SMS sent.');
         header('Location: /tailorshop/modules/reservations/view.php?id=' . $resId);
         exit;
     }

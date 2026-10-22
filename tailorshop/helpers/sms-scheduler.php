@@ -42,7 +42,7 @@ function runSMSScheduler(): array {
                 $rentalId,
                 'rentals'
             );
-            $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') .
+            $log[] = ($sent ? (SMS_MOCK_MODE ? 'SMS MOCKED' : 'SMS SENT') : 'SMS FAILED') .
                      ' — Customer reminder for rental #' . $rentalId;
         }
         if (!emailAttemptedToday($rental['email'] ?? '', $trigger, $rentalId, 'rentals')) {
@@ -73,7 +73,7 @@ function runSMSScheduler(): array {
                 $rentalId,
                 'rentals'
             );
-            $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') .
+            $log[] = ($sent ? (SMS_MOCK_MODE ? 'SMS MOCKED' : 'SMS SENT') : 'SMS FAILED') .
                      ' — Admin reminder for rental #' . $rentalId;
         }
         foreach ($adminRecipients as $admin) {
@@ -106,7 +106,7 @@ function runSMSScheduler(): array {
             $res['reservation_id'],
             'reservations'
         );
-        $log[] = ($sent ? 'SENT' : 'FAILED') .
+        $log[] = ($sent ? (SMS_MOCK_MODE ? 'MOCKED' : 'SENT') : 'FAILED') .
                  ' — Pickup reminder to ' . $res['customer_name'] .
                  ' for reservation #' . $res['reservation_id'];
     }
@@ -129,7 +129,8 @@ function runSMSScheduler(): array {
                     $rentalId,
                     'rentals'
                 );
-                $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') . ' — Overdue notice to customer #' . $rentalId;
+                $log[] = ($sent ? (SMS_MOCK_MODE ? 'SMS MOCKED' : 'SMS SENT') : 'SMS FAILED') .
+                         ' — Overdue notice to customer #' . $rentalId;
             }
             if (!empty($rental['email']) &&
                 !emailAttemptedToday($rental['email'], $customerTrigger, $rentalId, 'rentals')) {
@@ -157,7 +158,8 @@ function runSMSScheduler(): array {
                     $rentalId,
                     'rentals'
                 );
-                $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') . ' — Overdue alert to admin #' . $rentalId;
+                $log[] = ($sent ? (SMS_MOCK_MODE ? 'SMS MOCKED' : 'SMS SENT') : 'SMS FAILED') .
+                         ' — Overdue alert to admin #' . $rentalId;
             }
             foreach ($adminRecipients as $admin) {
                 if (emailAttemptedToday($admin['email'], $adminTrigger, $rentalId, 'rentals')) {
@@ -199,7 +201,8 @@ function runSMSScheduler(): array {
                 $itemId,
                 'material_items'
             );
-            $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') . ' — Low stock alert for ' . $item['item_name'];
+            $log[] = ($sent ? (SMS_MOCK_MODE ? 'SMS MOCKED' : 'SMS SENT') : 'SMS FAILED') .
+                     ' — Low stock alert for ' . $item['item_name'];
         }
 
         $message = buildLowStockEmail($item);
