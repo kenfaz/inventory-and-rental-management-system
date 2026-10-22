@@ -164,6 +164,12 @@ function navActive(string $page, string $current): string {
         </a>
       </li>
       <li>
+        <a href="/tailorshop/modules/logs/email-logs.php"
+           class="<?= navActive('email-logs', $activePage) ?>">
+          <i class="bi bi-envelope"></i> Email Logs
+        </a>
+      </li>
+      <li>
         <a href="/tailorshop/modules/settings/index.php"
            class="<?= navActive('settings', $activePage) ?>">
           <i class="bi bi-gear"></i> Settings

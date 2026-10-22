@@ -103,12 +103,12 @@ INSERT INTO garment_items
 -- ============================================================
 -- SAMPLE CUSTOMERS
 -- ============================================================
-INSERT INTO customers (full_name, mobile_number, address) VALUES
-('Ana Santos',    '09171234567', 'Blk 1 Lot 2 Sampaguita St., Calamba City'),
-('Pedro Reyes',   '09281234568', '123 Rizal Ave., Los Baños, Laguna'),
-('Maria Cruz',    '09351234569', '456 Aguinaldo St., San Pablo City'),
-('Jose Lim',      '09461234570', '789 Mabini St., Santa Rosa, Laguna'),
-('Rosa Garcia',   '09181234571', '321 Bonifacio St., Cabuyao, Laguna');
+INSERT INTO customers (full_name, mobile_number, email, address) VALUES
+('Ana Santos',    '09171234567', 'ana@example.test',   'Blk 1 Lot 2 Sampaguita St., Calamba City'),
+('Pedro Reyes',   '09281234568', 'pedro@example.test','123 Rizal Ave., Los Baños, Laguna'),
+('Maria Cruz',    '09351234569', 'maria@example.test','456 Aguinaldo St., San Pablo City'),
+('Jose Lim',      '09461234570', 'jose@example.test', '789 Mabini St., Santa Rosa, Laguna'),
+('Rosa Garcia',   '09181234571', 'rosa@example.test', '321 Bonifacio St., Cabuyao, Laguna');
 
 -- ============================================================
 -- SAMPLE RESERVATIONS

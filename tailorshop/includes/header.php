@@ -15,6 +15,7 @@ $pageTitle = $pageTitle ?? "Desire's Tailor Shop";
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($pageTitle) ?> — <?= APP_NAME ?></title>
+  <link rel="icon" type="image/svg+xml" href="/tailorshop/assets/img/favicon.svg">
 
   <script>
     const savedTheme = localStorage.getItem('tailorshop-theme');

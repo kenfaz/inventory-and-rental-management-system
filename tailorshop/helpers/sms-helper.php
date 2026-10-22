@@ -63,7 +63,7 @@ function sendSMS(
             $failureReason = 'HTTP ' . $httpCode . ': ' . $response;
         }
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $failureReason = 'Exception: ' . $e->getMessage();
     }
 
@@ -88,6 +88,28 @@ function sendSMS(
     }
 
     return $status === 'Sent';
+}
+
+function smsAttemptedToday(
+    string $number,
+    string $triggerType,
+    int $referenceId,
+    string $referenceType
+): bool {
+    global $pdo;
+
+    $stmt = $pdo->prepare('
+        SELECT COUNT(*)
+        FROM sms_logs
+        WHERE recipient_number = ?
+          AND trigger_type = ?
+          AND reference_id = ?
+          AND reference_type = ?
+          AND DATE(timestamp) = CURDATE()
+    ');
+    $stmt->execute([$number, $triggerType, $referenceId, $referenceType]);
+
+    return (int)$stmt->fetchColumn() > 0;
 }
 
 /**
@@ -133,6 +155,16 @@ function buildRentalReminderSMS(array $rental): string {
         SHOP_NAME,
         date('F j, Y', strtotime($rental['expected_return_date'])),
         $rental['penalty_rate_per_day']
+    );
+}
+
+function buildRentalOwnerReminderSMS(array $rental): string {
+    return sprintf(
+        "RENTAL DUE SOON: %s's rental of %s is due %s. Mobile: %s.",
+        $rental['customer_name'],
+        $rental['garment_name'],
+        date('M j', strtotime($rental['expected_return_date'])),
+        $rental['mobile_number']
     );
 }
 

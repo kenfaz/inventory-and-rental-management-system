@@ -15,6 +15,12 @@ define('SEMAPHORE_API_KEY',    'YOUR_SEMAPHORE_API_KEY_HERE');
 define('SEMAPHORE_SENDER_NAME','YOUR_SENDER_NAME_HERE');
 define('SEMAPHORE_API_URL',    'https://api.semaphore.co/api/v4/messages');
 
+// ── Local email delivery (Mailpit) ───────────────────────────
+define('MAIL_SMTP_HOST', getenv('MAIL_SMTP_HOST') ?: '127.0.0.1');
+define('MAIL_SMTP_PORT', (int)(getenv('MAIL_SMTP_PORT') ?: 1025));
+define('MAIL_FROM_ADDRESS', getenv('MAIL_FROM_ADDRESS') ?: 'alerts@tailorshop.local');
+define('MAIL_FROM_NAME', getenv('MAIL_FROM_NAME') ?: APP_NAME);
+
 // ── SMS Notification Settings ────────────────────────────────
 // Admin/owner mobile number — receives low stock and overdue alerts
 define('ADMIN_SMS_NUMBER',     '09XXXXXXXXX');
@@ -53,7 +59,7 @@ define('LOGIN_COOLDOWN_MINUTES', 15);
 
 // ── Rental Agreement ─────────────────────────────────────────
 define('SHOP_NAME',    "Desire's Tailor Shop");
-define('SHOP_ADDRESS', 'Your Shop Address Here');
+define('SHOP_ADDRESS', 'Chipeco Avenue, Calamba City, Laguna');
 define('SHOP_CONTACT', '09XXXXXXXXX');
 
 // ── Fix Path ─────────────────────────────────────────────────

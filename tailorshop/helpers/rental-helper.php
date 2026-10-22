@@ -98,7 +98,7 @@ function fetchRentalsForReminder(int $daysAhead = 3): array {
 
     $stmt = $pdo->prepare('
         SELECT r.rental_id, r.expected_return_date, r.penalty_rate_per_day,
-               c.full_name AS customer_name, c.mobile_number,
+               c.full_name AS customer_name, c.mobile_number, c.email,
                g.garment_name
         FROM rentals r
         JOIN customers     c ON r.customer_id = c.customer_id
@@ -118,7 +118,7 @@ function fetchOverdueRentals(): array {
 
     $stmt = $pdo->query('
         SELECT r.rental_id, r.expected_return_date, r.penalty_rate_per_day,
-               c.full_name AS customer_name, c.mobile_number,
+               c.full_name AS customer_name, c.mobile_number, c.email,
                g.garment_name
         FROM rentals r
         JOIN customers     c ON r.customer_id = c.customer_id

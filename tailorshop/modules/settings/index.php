@@ -144,10 +144,10 @@ require_once __DIR__ . '/../../includes/sidebar.php';
             <hr class="my-3">
             <a href="/tailorshop/api/run-scheduler.php"
                class="btn btn-outline-primary btn-sm">
-              <i class="bi bi-play-circle me-1"></i> Run SMS Scheduler Now
+              <i class="bi bi-play-circle me-1"></i> Run Notification Scheduler Now
             </a>
             <span class="text-muted small ms-2">
-              Sends pending reminders and overdue alerts.
+              Sends rental reminders, overdue alerts, and low-stock alerts by SMS and email.
             </span>
           </div>
         </div>
@@ -224,7 +224,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
             $tables = [
                 'users','customers','material_items','garment_items',
                 'reservations','rentals','tailoring_orders',
-                'sales_records','income_records','sms_logs','audit_logs','login_logs',
+                'sales_records','income_records','sms_logs','email_logs','audit_logs','login_logs',
                 'login_attempts',
             ];
             ?>

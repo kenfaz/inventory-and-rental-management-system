@@ -70,6 +70,7 @@ CREATE TABLE customers (
   customer_id   INT          NOT NULL AUTO_INCREMENT,
   full_name     VARCHAR(100) NOT NULL,
   mobile_number VARCHAR(20)  NOT NULL,
+  email         VARCHAR(254) NULL,
   address       VARCHAR(255) NULL,
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (customer_id)
@@ -482,7 +483,28 @@ CREATE TABLE sms_logs (
 ) ENGINE=InnoDB;
 
 -- ============================================================
--- TABLE 19: audit_logs
+-- TABLE 20: email_logs
+-- Record of outbound email notification attempts
+-- ============================================================
+CREATE TABLE email_logs (
+  email_log_id     INT          NOT NULL AUTO_INCREMENT,
+  recipient_email  VARCHAR(254) NOT NULL,
+  recipient_name   VARCHAR(100) NULL,
+  subject          VARCHAR(255) NOT NULL,
+  message_content  TEXT         NOT NULL,
+  trigger_type     VARCHAR(80)  NOT NULL,
+  reference_id     INT          NULL,
+  reference_type   VARCHAR(50)  NULL,
+  status           ENUM('Sent','Failed') NOT NULL DEFAULT 'Failed',
+  failure_reason   VARCHAR(255) NULL,
+  timestamp        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (email_log_id),
+  KEY idx_email_logs_reference (reference_type, reference_id, trigger_type, timestamp),
+  KEY idx_email_logs_recipient (recipient_email, timestamp)
+) ENGINE=InnoDB;
+
+-- ============================================================
+-- TABLE 21: audit_logs
 -- Permanent record of all sensitive system actions
 -- ============================================================
 CREATE TABLE audit_logs (

@@ -128,6 +128,12 @@ require_once __DIR__ . '/../../includes/sidebar.php';
               <i class="bi bi-phone me-1"></i>
               <?= htmlspecialchars($customer['mobile_number']) ?>
             </p>
+            <?php if (!empty($customer['email'])): ?>
+              <p class="text-muted mt-1 mb-0" style="font-size:13px">
+                <i class="bi bi-envelope me-1"></i>
+                <?= htmlspecialchars($customer['email']) ?>
+              </p>
+            <?php endif; ?>
             <?php if ($customer['address']): ?>
               <p class="text-muted mt-1 mb-0" style="font-size:12.5px">
                 <i class="bi bi-geo-alt me-1"></i>

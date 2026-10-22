@@ -515,7 +515,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
               </a>
               <a href="/tailorshop/api/run-scheduler.php"
                  class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-chat-dots me-1"></i> Run SMS Scheduler
+                <i class="bi bi-bell me-1"></i> Run Notification Scheduler
               </a>
             </div>
           </div>

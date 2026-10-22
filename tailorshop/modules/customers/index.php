@@ -16,9 +16,9 @@ $search = trim($_GET['q'] ?? '');
 $where  = [];
 $params = [];
 if ($search !== '') {
-    $where[]  = '(c.full_name LIKE ? OR c.mobile_number LIKE ? OR c.address LIKE ?)';
+    $where[]  = '(c.full_name LIKE ? OR c.mobile_number LIKE ? OR c.email LIKE ? OR c.address LIKE ?)';
     $like     = '%' . $search . '%';
-    $params   = [$like, $like, $like];
+    $params   = [$like, $like, $like, $like];
 }
 $whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
@@ -87,7 +87,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
           <i class="bi bi-search text-muted"></i>
           <input type="text" name="q"
                  class="form-control border-0 shadow-none ps-0"
-                 placeholder="Search by name, mobile, or address…"
+                 placeholder="Search by name, mobile, email, or address…"
                  value="<?= htmlspecialchars($search) ?>"
                  style="font-size:13.5px;flex:1">
           <button class="btn btn-sm btn-primary">Search</button>
@@ -107,6 +107,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
             <tr>
               <th>Name</th>
               <th>Mobile Number</th>
+              <th>Email</th>
               <th>Address</th>
               <th>Rentals</th>
               <th>Reservations</th>
@@ -118,7 +119,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
           <tbody>
             <?php if (empty($customers)): ?>
               <tr>
-                <td colspan="8" class="text-center text-muted py-5">
+                <td colspan="9" class="text-center text-muted py-5">
                   <i class="bi bi-people fs-3 d-block mb-2"></i>
                   <?= $search ? 'No customers matched your search.' : 'No customers yet.' ?>
                   <?php if (!$search): ?>
@@ -151,6 +152,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                     <i class="bi bi-phone text-muted me-1"></i>
                     <?= htmlspecialchars($c['mobile_number']) ?>
                   </td>
+                  <td><?= htmlspecialchars($c['email'] ?? '—') ?></td>
                   <td class="text-muted" style="font-size:12.5px;max-width:180px;
                               white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
                     <?= htmlspecialchars($c['address'] ?? '—') ?>

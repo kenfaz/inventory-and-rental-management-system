@@ -47,6 +47,7 @@ $agreementNo = 'RA-' . date('Y') . '-' . str_pad($rentalId, 5, '0', STR_PAD_LEFT
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rental Agreement — <?= $agreementNo ?></title>
+  <link rel="icon" type="image/svg+xml" href="/tailorshop/assets/img/favicon.svg">
   <style>
     /* ── Screen styles ── */
     * { box-sizing: border-box; margin: 0; padding: 0; }

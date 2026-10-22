@@ -15,6 +15,7 @@ $errors = [];
 $values = [
     'full_name'     => '',
     'mobile_number' => '',
+    'email'         => '',
     'address'       => '',
 ];
 
@@ -22,11 +23,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values = [
         'full_name'     => trim($_POST['full_name']     ?? ''),
         'mobile_number' => trim($_POST['mobile_number'] ?? ''),
+        'email'         => trim($_POST['email']         ?? ''),
         'address'       => trim($_POST['address']       ?? ''),
     ];
 
     if ($values['full_name'] === '')
         $errors['full_name'] = 'Full name is required.';
+
+    if ($values['email'] === '') {
+        $errors['email'] = 'Email address is required.';
+    } elseif (!filter_var($values['email'], FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Enter a valid email address.';
+    }
 
     if ($values['mobile_number'] === '') {
         $errors['mobile_number'] = 'Mobile number is required.';
@@ -41,11 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         $pdo->prepare('
-            INSERT INTO customers (full_name, mobile_number, address)
-            VALUES (?, ?, ?)
+            INSERT INTO customers (full_name, mobile_number, email, address)
+            VALUES (?, ?, ?, ?)
         ')->execute([
             $values['full_name'],
             $values['mobile_number'],
+            $values['email'],
             $values['address'] ?: null,
         ]);
 
@@ -112,6 +121,18 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                     <div class="invalid-feedback"><?= $errors['mobile_number'] ?></div>
                   <?php endif; ?>
                 </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                <input type="email" name="email"
+                       class="form-control <?= isset($errors['email']) ? 'is-invalid' : '' ?>"
+                       placeholder="customer@example.com"
+                       value="<?= htmlspecialchars($values['email']) ?>"
+                       required>
+                <?php if (isset($errors['email'])): ?>
+                  <div class="invalid-feedback"><?= htmlspecialchars($errors['email']) ?></div>
+                <?php endif; ?>
               </div>
 
               <div class="mb-4">

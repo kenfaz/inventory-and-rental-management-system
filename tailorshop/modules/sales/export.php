@@ -122,6 +122,7 @@ if ($format === 'csv') {
 <head>
   <meta charset="UTF-8">
   <title>Sales Report — <?= $exportDate ?></title>
+  <link rel="icon" type="image/svg+xml" href="/tailorshop/assets/img/favicon.svg">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {

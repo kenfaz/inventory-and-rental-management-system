@@ -1,21 +1,27 @@
 <?php
 // ============================================================
 // helpers/sms-scheduler.php
-// Checks all pending SMS triggers and dispatches messages
+// Checks scheduled notification triggers and dispatches SMS and email
 // Call this via cron or from api/run-scheduler.php
 // ============================================================
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/sms-helper.php';
+require_once __DIR__ . '/email-helper.php';
 require_once __DIR__ . '/rental-helper.php';
 
 /**
- * Run all scheduled SMS checks
+ * Run all scheduled SMS and email checks
  * Returns a summary of what was processed
  */
 function runSMSScheduler(): array {
     $log = [];
+    $adminRecipients = getActiveAdminEmailRecipients();
+    if (!$adminRecipients) {
+        error_log('Notification scheduler: no active admin email recipients are configured.');
+        $log[] = 'No active admin email recipients configured.';
+    }
 
     // 1. Sync rental statuses first
     syncRentalStatuses();
@@ -25,16 +31,68 @@ function runSMSScheduler(): array {
     $log[] = '-- Rental reminders --';
     $rentalsForReminder = fetchRentalsForReminder(RENTAL_REMINDER_DAYS);
     foreach ($rentalsForReminder as $rental) {
-        $sent = sendSMS(
-            $rental['mobile_number'],
-            buildRentalReminderSMS($rental),
-            'Rental Return Reminder',
-            $rental['rental_id'],
-            'rentals'
-        );
-        $log[] = ($sent ? 'SENT' : 'FAILED') .
-                 ' — Reminder to ' . $rental['customer_name'] .
-                 ' for rental #' . $rental['rental_id'];
+        $trigger = 'Rental Return Reminder';
+        $rentalId = (int)$rental['rental_id'];
+
+        if (!smsAttemptedToday($rental['mobile_number'], $trigger, $rentalId, 'rentals')) {
+            $sent = sendSMS(
+                $rental['mobile_number'],
+                buildRentalReminderSMS($rental),
+                $trigger,
+                $rentalId,
+                'rentals'
+            );
+            $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') .
+                     ' — Customer reminder for rental #' . $rentalId;
+        }
+        if (!emailAttemptedToday($rental['email'] ?? '', $trigger, $rentalId, 'rentals')) {
+            if (!empty($rental['email'])) {
+                $message = buildRentalReminderEmail($rental);
+                $sent = sendEmail(
+                    $rental['email'],
+                    $rental['customer_name'],
+                    $message['subject'],
+                    $message['message'],
+                    $trigger,
+                    $rentalId,
+                    'rentals'
+                );
+                $log[] = ($sent ? 'EMAIL SENT' : 'EMAIL FAILED') .
+                         ' — Customer reminder for rental #' . $rentalId;
+            } else {
+                error_log('Rental reminder email skipped: customer email missing for rental #' . $rentalId);
+                $log[] = 'EMAIL SKIPPED — Customer email missing for rental #' . $rentalId;
+            }
+        }
+
+        if (!smsAttemptedToday(ADMIN_SMS_NUMBER, $trigger, $rentalId, 'rentals')) {
+            $sent = sendSMS(
+                ADMIN_SMS_NUMBER,
+                buildRentalOwnerReminderSMS($rental),
+                $trigger,
+                $rentalId,
+                'rentals'
+            );
+            $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') .
+                     ' — Admin reminder for rental #' . $rentalId;
+        }
+        foreach ($adminRecipients as $admin) {
+            if (emailAttemptedToday($admin['email'], $trigger, $rentalId, 'rentals')) {
+                continue;
+            }
+            $message = buildRentalReminderAdminEmail($rental);
+            $sent = sendEmail(
+                $admin['email'],
+                $admin['full_name'],
+                $message['subject'],
+                $message['message'],
+                $trigger,
+                $rentalId,
+                'rentals'
+            );
+            $log[] = ($sent ? 'EMAIL SENT' : 'EMAIL FAILED') .
+                     ' — Admin reminder for rental #' . $rentalId;
+        }
     }
 
     // 3. Reservation pickup reminders (3 days before pickup)
@@ -59,23 +117,106 @@ function runSMSScheduler(): array {
     foreach ($overdueRentals as $rental) {
         // Check if escalation is due today
         if (shouldSendEscalation($rental['rental_id'])) {
-            // SMS to customer
-            sendSMS(
-                $rental['mobile_number'],
-                buildOverdueCustomerSMS($rental),
-                'Rental Overdue Escalation',
-                $rental['rental_id'],
-                'rentals'
-            );
-            // SMS to owner
-            sendSMS(
+            $rentalId = (int)$rental['rental_id'];
+            $customerTrigger = 'Rental Overdue Escalation';
+            $adminTrigger = 'Rental Overdue Alert';
+
+            if (!smsAttemptedToday($rental['mobile_number'], $customerTrigger, $rentalId, 'rentals')) {
+                $sent = sendSMS(
+                    $rental['mobile_number'],
+                    buildOverdueCustomerSMS($rental),
+                    $customerTrigger,
+                    $rentalId,
+                    'rentals'
+                );
+                $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') . ' — Overdue notice to customer #' . $rentalId;
+            }
+            if (!empty($rental['email']) &&
+                !emailAttemptedToday($rental['email'], $customerTrigger, $rentalId, 'rentals')) {
+                $message = buildOverdueCustomerEmail($rental);
+                $sent = sendEmail(
+                    $rental['email'],
+                    $rental['customer_name'],
+                    $message['subject'],
+                    $message['message'],
+                    $customerTrigger,
+                    $rentalId,
+                    'rentals'
+                );
+                $log[] = ($sent ? 'EMAIL SENT' : 'EMAIL FAILED') . ' — Overdue notice to customer #' . $rentalId;
+            } elseif (empty($rental['email'])) {
+                error_log('Overdue email skipped: customer email missing for rental #' . $rentalId);
+                $log[] = 'EMAIL SKIPPED — Customer email missing for rental #' . $rentalId;
+            }
+
+            if (!smsAttemptedToday(ADMIN_SMS_NUMBER, $adminTrigger, $rentalId, 'rentals')) {
+                $sent = sendSMS(
+                    ADMIN_SMS_NUMBER,
+                    buildOverdueOwnerSMS($rental),
+                    $adminTrigger,
+                    $rentalId,
+                    'rentals'
+                );
+                $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') . ' — Overdue alert to admin #' . $rentalId;
+            }
+            foreach ($adminRecipients as $admin) {
+                if (emailAttemptedToday($admin['email'], $adminTrigger, $rentalId, 'rentals')) {
+                    continue;
+                }
+                $message = buildOverdueAdminEmail($rental);
+                $sent = sendEmail(
+                    $admin['email'],
+                    $admin['full_name'],
+                    $message['subject'],
+                    $message['message'],
+                    $adminTrigger,
+                    $rentalId,
+                    'rentals'
+                );
+                $log[] = ($sent ? 'EMAIL SENT' : 'EMAIL FAILED') . ' — Overdue alert to admin #' . $rentalId;
+            }
+        }
+    }
+
+    // 5. Low/depleted material stock alerts to admins by SMS and email
+    $log[] = '-- Low stock alerts --';
+    global $pdo;
+    $lowStockItems = $pdo->query('
+        SELECT item_id, item_name, brand, quantity, unit, low_stock_threshold
+        FROM material_items
+        WHERE quantity <= low_stock_threshold
+        ORDER BY item_name
+    ')->fetchAll();
+    foreach ($lowStockItems as $item) {
+        $itemId = (int)$item['item_id'];
+        $trigger = 'Low Stock Alert';
+
+        if (!smsAttemptedToday(ADMIN_SMS_NUMBER, $trigger, $itemId, 'material_items')) {
+            $sent = sendSMS(
                 ADMIN_SMS_NUMBER,
-                buildOverdueOwnerSMS($rental),
-                'Rental Overdue Alert',
-                $rental['rental_id'],
-                'rentals'
+                buildLowStockSMS($item),
+                $trigger,
+                $itemId,
+                'material_items'
             );
-            $log[] = 'Overdue escalation sent for rental #' . $rental['rental_id'];
+            $log[] = ($sent ? 'SMS SENT' : 'SMS FAILED') . ' — Low stock alert for ' . $item['item_name'];
+        }
+
+        $message = buildLowStockEmail($item);
+        foreach ($adminRecipients as $admin) {
+            if (emailAttemptedToday($admin['email'], $trigger, $itemId, 'material_items')) {
+                continue;
+            }
+            $sent = sendEmail(
+                $admin['email'],
+                $admin['full_name'],
+                $message['subject'],
+                $message['message'],
+                $trigger,
+                $itemId,
+                'material_items'
+            );
+            $log[] = ($sent ? 'EMAIL SENT' : 'EMAIL FAILED') . ' — Low stock alert for ' . $item['item_name'];
         }
     }
 

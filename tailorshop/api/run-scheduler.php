@@ -1,7 +1,7 @@
 <?php
 // ============================================================
 // api/run-scheduler.php
-// Manually triggers the SMS scheduler
+// Manually triggers scheduled SMS and email notifications
 // Can be called from the admin dashboard Quick Actions
 // ============================================================
 
@@ -18,6 +18,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 
 $log = runSMSScheduler();
 
-$_SESSION['success'] = 'SMS scheduler ran successfully. ' . count($log) . ' checks completed.';
+$_SESSION['success'] = 'Notification scheduler ran successfully. ' . count($log) . ' checks completed.';
 header('Location: /tailorshop/modules/dashboard/admin.php');
 exit;
