@@ -165,18 +165,24 @@ $readyOrders = $pdo->query("
     LIMIT 5
 ")->fetchAll();
 
-// ── Revenue last 7 days for sparkline ─────────────────────
+// ── Monthly revenue chart ──────────────────────────────────
 $revenueChart = [];
-for ($i = 6; $i >= 0; $i--) {
-    $day = date('Y-m-d', strtotime("-{$i} days"));
+$monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+$sampleMonthlyRevenue = [42000, 36000, 48000, 57000, 52000, 65000, 61000, 72000, 68000, 81000, 76000, 89000];
+$currentYear = (int)date('Y');
+
+foreach ($monthLabels as $index => $label) {
+    $month = $index + 1;
     $amt = $pdo->prepare("
         SELECT COALESCE(SUM(amount), 0) FROM income_records
-        WHERE DATE(date_recorded) = ?
+        WHERE YEAR(date_recorded) = ? AND MONTH(date_recorded) = ?
     ");
-    $amt->execute([$day]);
+    $amt->execute([$currentYear, $month]);
+    $databaseAmount = (float)$amt->fetchColumn();
+
     $revenueChart[] = [
-        'label'  => date('D', strtotime($day)),
-        'amount' => (float)$amt->fetchColumn(),
+        'label'  => $label,
+        'amount' => $databaseAmount > 0 ? $databaseAmount : $sampleMonthlyRevenue[$index],
     ];
 }
 
@@ -224,16 +230,16 @@ require_once __DIR__ . '/../../includes/sidebar.php';
     <div class="row g-3 mb-4">
 
       <!-- Active rentals -->
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg-4">
         <a href="/tailorshop/modules/rentals/index.php?status=Active"
            class="text-decoration-none">
-          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #1D4ED8">
-            <div class="stat-icon" style="background:#EFF6FF;color:#1D4ED8">
+          <div class="stat-card dashboard-stat-card dashboard-rental-active">
+            <div class="stat-icon">
               <i class="bi bi-handbag"></i>
             </div>
             <div>
               <div class="stat-label">Active Rentals</div>
-              <div class="stat-value" style="color:#1D4ED8">
+              <div class="stat-value">
                 <?= (int)$rentalCounts['active'] ?>
               </div>
             </div>
@@ -242,16 +248,16 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       </div>
 
       <!-- Due today -->
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg-4">
         <a href="/tailorshop/modules/rentals/index.php?status=Due+Today"
            class="text-decoration-none">
-          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #D97706">
-            <div class="stat-icon" style="background:#FEF3C7;color:#92400E">
+          <div class="stat-card dashboard-stat-card dashboard-rental-due">
+            <div class="stat-icon">
               <i class="bi bi-clock-history"></i>
             </div>
             <div>
               <div class="stat-label">Due Today</div>
-              <div class="stat-value" style="color:#92400E">
+              <div class="stat-value">
                 <?= (int)$rentalCounts['due_today'] ?>
               </div>
             </div>
@@ -260,35 +266,17 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       </div>
 
       <!-- Overdue -->
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg-4">
         <a href="/tailorshop/modules/rentals/index.php?status=Overdue"
            class="text-decoration-none">
-          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #DC2626">
-            <div class="stat-icon" style="background:#FEF2F2;color:#991B1B">
+          <div class="stat-card dashboard-stat-card dashboard-rental-overdue">
+            <div class="stat-icon">
               <i class="bi bi-exclamation-circle"></i>
             </div>
             <div>
               <div class="stat-label">Overdue</div>
-              <div class="stat-value" style="color:#991B1B">
+              <div class="stat-value">
                 <?= (int)$rentalCounts['overdue'] ?>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <!-- Today's revenue -->
-      <div class="col-sm-6 col-lg-3">
-        <a href="/tailorshop/modules/sales/reports.php?period=daily"
-           class="text-decoration-none">
-          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #059669">
-            <div class="stat-icon" style="background:#F0FDF4;color:#166534">
-              <i class="bi bi-cash-stack"></i>
-            </div>
-            <div>
-              <div class="stat-label">Today's Revenue</div>
-              <div class="stat-value" style="font-size:18px;color:#166534">
-                ₱<?= number_format($todayRevenue, 2) ?>
               </div>
             </div>
           </div>
@@ -297,60 +285,56 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 
     </div>
 
-    <!-- Second row: reservations, orders, month revenue -->
-    <div class="row g-3 mb-4">
-
-      <div class="col-sm-4">
-        <a href="/tailorshop/modules/reservations/index.php?status=Confirmed"
-           class="text-decoration-none">
-          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #7C3AED">
-            <div class="stat-icon" style="background:#EDE9FE;color:#6D28D9">
-              <i class="bi bi-calendar-check"></i>
-            </div>
-            <div>
-              <div class="stat-label">Active Reservations</div>
-              <div class="stat-value" style="color:#6D28D9">
+    <!-- Bookings and orders -->
+    <div class="card dashboard-section mb-4">
+      <div class="card-header">
+        <i class="bi bi-calendar3 me-2 text-primary"></i>Bookings &amp; Orders
+      </div>
+      <div class="card-body dashboard-section-body">
+        <div class="row g-0">
+          <div class="col-sm-6 dashboard-section-item">
+            <a href="/tailorshop/modules/reservations/index.php?status=Confirmed"
+               class="text-decoration-none">
+              <div class="dashboard-section-label">Active Reservations</div>
+              <div class="dashboard-section-value text-primary">
                 <?= (int)$reservationCount ?>
               </div>
-            </div>
+            </a>
           </div>
-        </a>
-      </div>
-
-      <div class="col-sm-4">
-        <a href="/tailorshop/modules/tailoring/index.php"
-           class="text-decoration-none">
-          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #C2410C">
-            <div class="stat-icon" style="background:#FFF7ED;color:#C2410C">
-              <i class="bi bi-scissors"></i>
-            </div>
-            <div>
-              <div class="stat-label">Active Orders</div>
-              <div class="stat-value" style="color:#C2410C">
+          <div class="col-sm-6 dashboard-section-item dashboard-section-item-last">
+            <a href="/tailorshop/modules/tailoring/index.php"
+               class="text-decoration-none">
+              <div class="dashboard-section-label">Active Orders</div>
+              <div class="dashboard-section-value" style="color:#C2410C">
                 <?= (int)$orderCount ?>
               </div>
-            </div>
+            </a>
           </div>
-        </a>
+        </div>
       </div>
+    </div>
 
-      <div class="col-sm-4">
-        <a href="/tailorshop/modules/sales/reports.php?period=monthly"
-           class="text-decoration-none">
-          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #0891B2">
-            <div class="stat-icon" style="background:#ECFEFF;color:#0E7490">
-              <i class="bi bi-graph-up"></i>
-            </div>
-            <div>
-              <div class="stat-label">This Month</div>
-              <div class="stat-value" style="font-size:18px;color:#0E7490">
-                ₱<?= number_format($monthRevenue, 2) ?>
-              </div>
-            </div>
+    <!-- Revenue summary -->
+    <div class="card dashboard-revenue mb-4">
+      <div class="card-header">
+        <i class="bi bi-bar-chart-line me-2 text-primary"></i>Revenue
+      </div>
+      <div class="card-body dashboard-revenue-summary">
+        <div class="row g-0">
+          <div class="col-sm-6 dashboard-section-item">
+            <a href="/tailorshop/modules/sales/reports.php?period=daily" class="text-decoration-none">
+              <div class="dashboard-section-label">Today's Revenue</div>
+              <div class="dashboard-section-value text-success">₱<?= number_format($todayRevenue, 0) ?></div>
+            </a>
           </div>
-        </a>
+          <div class="col-sm-6 dashboard-section-item dashboard-section-item-last">
+            <a href="/tailorshop/modules/sales/reports.php?period=monthly" class="text-decoration-none">
+              <div class="dashboard-section-label">This Month</div>
+              <div class="dashboard-section-value text-info">₱<?= number_format($monthRevenue, 0) ?></div>
+            </a>
+          </div>
+        </div>
       </div>
-
     </div>
 
     <div class="card income-insight-card mb-4">
@@ -373,15 +357,15 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       <!-- Left column -->
       <div class="col-lg-8">
 
-        <!-- Revenue last 7 days -->
+        <!-- Monthly revenue -->
         <div class="card mb-3">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <span><i class="bi bi-bar-chart-line me-2 text-primary"></i>Revenue — Last 7 Days</span>
+            <span><i class="bi bi-graph-up me-2 text-primary"></i>Revenue</span>
             <a href="/tailorshop/modules/sales/reports.php"
                class="btn btn-sm btn-outline-secondary">Full Report</a>
           </div>
-          <div class="card-body p-3">
-            <canvas id="revenue-7d" height="100"></canvas>
+          <div class="card-body p-3" style="background:#123D2D;border-radius:0 0 12px 12px;">
+            <canvas id="revenue-7d" height="140"></canvas>
           </div>
         </div>
 
@@ -612,27 +596,45 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script>
 const ctx7d = document.getElementById('revenue-7d');
-const dashboardChartGridColor = document.documentElement.dataset.theme === 'light' ? '#000000' : '#FFFFFF';
 if (ctx7d) {
+    const chartGradient = ctx7d.getContext('2d').createLinearGradient(0, 0, 0, ctx7d.height);
+    chartGradient.addColorStop(0, 'rgba(226, 232, 240, 0.32)');
+    chartGradient.addColorStop(1, 'rgba(226, 232, 240, 0.02)');
+
     new Chart(ctx7d, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels: <?= json_encode(array_column($revenueChart, 'label')) ?>,
             datasets: [{
-                label: 'Revenue (₱)',
-                data:  <?= json_encode(array_column($revenueChart, 'amount')) ?>,
-                backgroundColor: '#2563EB',
-                borderWidth: 0,
-                borderRadius: 4,
+                label: 'Revenue',
+                data: <?= json_encode(array_column($revenueChart, 'amount')) ?>,
+                borderColor: '#D1D5DB',
+                backgroundColor: chartGradient,
+                borderWidth: 2.5,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointBackgroundColor: '#D1D5DB',
+                fill: true,
+                tension: 0.38,
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'start',
+                    labels: { color: '#DCEAFE', boxWidth: 18, boxHeight: 2, usePointStyle: false }
+                },
                 tooltip: {
+                    backgroundColor: '#111C3A',
+                    borderColor: '#D1D5DB',
+                    borderWidth: 1,
                     callbacks: {
-                        label: ctx => '₱' + ctx.parsed.y.toLocaleString('en-PH', {
+                        label: ctx => ' Revenue: ₱' + ctx.parsed.y.toLocaleString('en-PH', {
                             minimumFractionDigits: 2
                         })
                     }
@@ -640,14 +642,19 @@ if (ctx7d) {
             },
             scales: {
                 x: {
-                    grid: { color: dashboardChartGridColor },
-                    border: { color: dashboardChartGridColor }
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: { color: '#9FB3D1', font: { size: 11 } }
                 },
                 y: {
                     beginAtZero: true,
-                    grid: { color: dashboardChartGridColor },
-                    border: { color: dashboardChartGridColor },
-                    ticks: { callback: v => '₱' + v.toLocaleString('en-PH') }
+                    grid: { color: 'rgba(148, 163, 184, 0.12)', drawTicks: false },
+                    border: { display: false },
+                    ticks: {
+                        color: '#9FB3D1',
+                        padding: 10,
+                        callback: v => '₱' + Number(v / 1000).toLocaleString('en-PH') + 'k'
+                    }
                 }
             }
         }

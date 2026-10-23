@@ -84,7 +84,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       foreach ($overviewCards as $card):
       ?>
         <div class="col-sm-6 col-lg-4 col-xl-2">
-          <div class="stat-card" style="border-left:3px solid <?= $card['color'] ?>">
+          <div class="stat-card solid-stat-card" style="border-left:3px solid <?= $card['color'] ?>">
             <div class="stat-icon"
                  style="background:<?= $card['bg'] ?>;color:<?= $card['color'] ?>">
               <i class="bi <?= $card['icon'] ?>"></i>
