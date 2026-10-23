@@ -32,7 +32,7 @@ try {
     $mail->Body = 'PHPMailer successfully sent this test message to the local Mailpit inbox.';
 
     $mail->send();
-    fwrite(STDOUT, "Test email sent to Mailpit. Open http://127.0.0.1:8025 to view it.\n");
+    fwrite(STDOUT, "Test email sent to Mailpit. Open http://127.0.0.1:1025 to view it.\n");
 } catch (Exception $e) {
     fwrite(STDERR, "Could not send test email to Mailpit: {$mail->ErrorInfo}\n");
     exit(1);

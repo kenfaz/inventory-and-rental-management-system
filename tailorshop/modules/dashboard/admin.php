@@ -128,6 +128,10 @@ for ($i = 6; $i >= 0; $i--) {
     ];
 }
 
+$schedulerSuccess = $_SESSION['success'] ?? '';
+$schedulerError = $_SESSION['error'] ?? '';
+unset($_SESSION['success'], $_SESSION['error']);
+
 require_once __DIR__ . '/../../includes/header.php';
 require_once __DIR__ . '/../../includes/sidebar.php';
 ?>
@@ -139,6 +143,30 @@ require_once __DIR__ . '/../../includes/sidebar.php';
   </div>
 
   <div class="page-body">
+
+    <?php if ($schedulerSuccess || $schedulerError): ?>
+      <?php $schedulerSucceeded = $schedulerSuccess !== ''; ?>
+      <div class="modal fade" id="schedulerResultModal" tabindex="-1"
+           aria-labelledby="schedulerResultTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header <?= $schedulerSucceeded ? 'border-success' : 'border-danger' ?>">
+              <h5 class="modal-title" id="schedulerResultTitle">
+                <i class="bi <?= $schedulerSucceeded ? 'bi-check-circle-fill text-success' : 'bi-exclamation-triangle-fill text-danger' ?> me-2"></i>
+                <?= $schedulerSucceeded ? 'Scheduler Completed' : 'Scheduler Failed' ?>
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <?= htmlspecialchars($schedulerSucceeded ? $schedulerSuccess : $schedulerError) ?>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <!-- Welcome -->
     <div class="mb-4">
@@ -564,6 +592,13 @@ if (ctx7d) {
         }
     });
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const schedulerModal = document.getElementById('schedulerResultModal');
+    if (schedulerModal && window.bootstrap) {
+        bootstrap.Modal.getOrCreateInstance(schedulerModal).show();
+    }
+});
 </script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

@@ -16,8 +16,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 
-$log = runSMSScheduler();
+try {
+    $log = runSMSScheduler();
+    $summary = implode(' | ', $log);
+    $_SESSION['success'] = 'Notification scheduler completed. ' . $summary;
+} catch (Throwable $e) {
+    error_log('Notification scheduler error: ' . $e->getMessage());
+    $_SESSION['error'] = 'Notification scheduler failed: ' . $e->getMessage();
+}
 
-$_SESSION['success'] = 'Notification scheduler ran successfully. ' . count($log) . ' checks completed.';
 header('Location: /tailorshop/modules/dashboard/admin.php');
 exit;
