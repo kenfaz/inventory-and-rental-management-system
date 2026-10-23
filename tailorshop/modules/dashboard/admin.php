@@ -107,6 +107,10 @@ if ((float)$monthRevenue <= 0) {
     $incomeInsightTone = 'text-danger';
 }
 
+$topIncomeShare = (!empty($topIncomeType) && (float)$monthRevenue > 0)
+    ? ((float)$topIncomeType['total'] / (float)$monthRevenue * 100)
+    : 0.0;
+
 if (!empty($topIncomeType) && (float)$topIncomeType['total'] > 0) {
     $incomeInsight .= sprintf(
         ' %s is the leading income source at %s.',
@@ -314,39 +318,48 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       </div>
     </div>
 
-    <!-- Revenue summary -->
-    <div class="card dashboard-revenue mb-4">
-      <div class="card-header">
-        <i class="bi bi-bar-chart-line me-2 text-primary"></i>Revenue
-      </div>
-      <div class="card-body dashboard-revenue-summary">
-        <div class="row g-0">
-          <div class="col-sm-6 dashboard-section-item">
-            <a href="/tailorshop/modules/sales/reports.php?period=daily" class="text-decoration-none">
-              <div class="dashboard-section-label">Today's Revenue</div>
-              <div class="dashboard-section-value text-success">₱<?= number_format($todayRevenue, 0) ?></div>
-            </a>
-          </div>
-          <div class="col-sm-6 dashboard-section-item dashboard-section-item-last">
-            <a href="/tailorshop/modules/sales/reports.php?period=monthly" class="text-decoration-none">
-              <div class="dashboard-section-label">This Month</div>
-              <div class="dashboard-section-value text-info">₱<?= number_format($monthRevenue, 0) ?></div>
-            </a>
+    <div class="card income-insights-card mb-4">
+      <div class="income-insights-header">
+        <div class="d-flex align-items-center gap-3">
+          <div class="income-insights-icon"><i class="bi bi-bar-chart-line"></i></div>
+          <div>
+            <h5 class="mb-1">Income Insights</h5>
+            <div class="income-insights-subtitle">Monthly performance analysis</div>
           </div>
         </div>
+        <div class="income-change-badge <?= $incomeChangePercent >= 0 ? 'positive' : 'negative' ?>">
+          <?= $incomeChangePercent >= 0 ? '▲' : '▼' ?> <?= number_format(abs($incomeChangePercent), 0) ?>%
+        </div>
       </div>
-    </div>
 
-    <div class="card income-insight-card mb-4">
-      <div class="card-body d-flex align-items-center gap-4">
-        <div class="income-insight-icon flex-shrink-0">
-          <i class="bi bi-chat-left-text"></i>
+      <div class="income-insights-body">
+        <div class="income-total-label">Total income this month</div>
+        <div class="income-total-value">₱<?= number_format((float)$monthRevenue, 2) ?></div>
+        <div class="income-comparison <?= $incomeChangePercent >= 0 ? 'text-success' : 'text-danger' ?>">
+          <?= $incomeChangePercent >= 0 ? '▲' : '▼' ?> <?= number_format(abs($incomeChangePercent), 0) ?>% compared with last month
         </div>
-        <div>
-          <div class="income-insight-title mb-2">Income Insight</div>
-          <p class="income-insight-text mb-0 <?= $incomeInsightTone ?>">
-            <?= htmlspecialchars($incomeInsight) ?>
-          </p>
+
+        <?php $source = $topIncomeType ?: ['income_type' => 'No income recorded', 'total' => 0]; ?>
+        <div class="income-source-block">
+          <div class="income-source-main">
+            <div class="income-source-icon"><i class="bi bi-trophy"></i></div>
+            <div>
+              <div class="income-source-label">TOP INCOME SOURCE</div>
+              <div class="income-source-name"><?= htmlspecialchars($source['income_type']) ?></div>
+            </div>
+          </div>
+          <div class="income-source-amount">
+            ₱<?= number_format((float)$source['total'], 0) ?>
+            <div><?= number_format($topIncomeShare, 1) ?>% of total</div>
+          </div>
+        </div>
+        <div class="income-source-progress">
+          <div style="width:<?= min(100, max(0, $topIncomeShare)) ?>%"></div>
+        </div>
+
+        <div class="income-insights-summary">
+          <i class="bi bi-info-circle"></i>
+          <span><?= htmlspecialchars($incomeInsight) ?></span>
         </div>
       </div>
     </div>

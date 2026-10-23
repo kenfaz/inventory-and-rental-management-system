@@ -193,7 +193,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
             <i class="bi bi-bar-chart-line me-2 text-primary"></i>
             Revenue Trend
           </div>
-          <div class="card-body p-3">
+          <div class="card-body p-3" style="background:#123D2D;border-radius:0 0 12px 12px;">
             <canvas id="revenue-chart" height="<?= $period === 'daily' ? '80' : '140' ?>"></canvas>
           </div>
         </div>
@@ -382,27 +382,45 @@ const chartLabels = <?= json_encode(array_map(
 const chartValues = <?= json_encode(array_values($chartData)) ?>;
 
 const revenueCtx = document.getElementById('revenue-chart');
-const reportChartGridColor = document.documentElement.dataset.theme === 'light' ? '#000000' : '#FFFFFF';
 if (revenueCtx) {
+    const reportChartGradient = revenueCtx.getContext('2d').createLinearGradient(0, 0, 0, revenueCtx.height);
+    reportChartGradient.addColorStop(0, 'rgba(226, 232, 240, 0.32)');
+    reportChartGradient.addColorStop(1, 'rgba(226, 232, 240, 0.02)');
+
     new Chart(revenueCtx, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels: chartLabels,
             datasets: [{
-                label: 'Revenue (₱)',
+                label: 'Revenue',
                 data: chartValues,
-                backgroundColor: '#2563EB',
-                borderWidth: 0,
-                borderRadius: 4,
+                borderColor: '#D1D5DB',
+                backgroundColor: reportChartGradient,
+                borderWidth: 2.5,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointBackgroundColor: '#D1D5DB',
+                fill: true,
+                tension: 0.38,
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'start',
+                    labels: { color: '#DCEAFE', boxWidth: 18, boxHeight: 2, usePointStyle: false }
+                },
                 tooltip: {
+                    backgroundColor: '#0F2A20',
+                    borderColor: '#D1D5DB',
+                    borderWidth: 1,
                     callbacks: {
-                        label: ctx => '₱' + ctx.parsed.y.toLocaleString('en-PH', {
+                        label: ctx => ' Revenue: ₱' + ctx.parsed.y.toLocaleString('en-PH', {
                             minimumFractionDigits: 2
                         })
                     }
@@ -410,15 +428,18 @@ if (revenueCtx) {
             },
             scales: {
                 x: {
-                    grid: { color: reportChartGridColor },
-                    border: { color: reportChartGridColor }
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: { color: '#D1D5DB', font: { size: 11 } }
                 },
                 y: {
                     beginAtZero: true,
-                    grid: { color: reportChartGridColor },
-                    border: { color: reportChartGridColor },
+                    grid: { color: 'rgba(226, 232, 240, 0.12)', drawTicks: false },
+                    border: { display: false },
                     ticks: {
-                        callback: v => '₱' + v.toLocaleString('en-PH')
+                        color: '#D1D5DB',
+                        padding: 10,
+                        callback: v => '₱' + Number(v / 1000).toLocaleString('en-PH') + 'k'
                     }
                 }
             }
