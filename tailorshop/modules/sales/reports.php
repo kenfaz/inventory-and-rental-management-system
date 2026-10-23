@@ -382,6 +382,7 @@ const chartLabels = <?= json_encode(array_map(
 const chartValues = <?= json_encode(array_values($chartData)) ?>;
 
 const revenueCtx = document.getElementById('revenue-chart');
+const reportChartGridColor = document.documentElement.dataset.theme === 'light' ? '#000000' : '#FFFFFF';
 if (revenueCtx) {
     new Chart(revenueCtx, {
         type: 'bar',
@@ -390,10 +391,9 @@ if (revenueCtx) {
             datasets: [{
                 label: 'Revenue (₱)',
                 data: chartValues,
-                backgroundColor: 'rgba(124,58,237,0.15)',
-                borderColor: 'rgba(124,58,237,0.8)',
-                borderWidth: 2,
-                borderRadius: 6,
+                backgroundColor: '#2563EB',
+                borderWidth: 0,
+                borderRadius: 4,
             }]
         },
         options: {
@@ -409,8 +409,14 @@ if (revenueCtx) {
                 }
             },
             scales: {
+                x: {
+                    grid: { color: reportChartGridColor },
+                    border: { color: reportChartGridColor }
+                },
                 y: {
                     beginAtZero: true,
+                    grid: { color: reportChartGridColor },
+                    border: { color: reportChartGridColor },
                     ticks: {
                         callback: v => '₱' + v.toLocaleString('en-PH')
                     }
@@ -420,19 +426,19 @@ if (revenueCtx) {
     });
 }
 
-// Income type donut chart
+// Income type pie chart
 <?php if (!empty($report['by_type'])): ?>
 const typeCtx = document.getElementById('type-chart');
 if (typeCtx) {
     new Chart(typeCtx, {
-        type: 'doughnut',
+        type: 'pie',
         data: {
             labels: <?= json_encode(array_column($report['by_type'], 'income_type')) ?>,
             datasets: [{
                 data: <?= json_encode(array_column($report['by_type'], 'subtotal')) ?>,
-                backgroundColor: ['#FEF3C7','#EFF6FF','#EDE9FE'],
-                borderColor:     ['#D97706','#1D4ED8','#5B21B6'],
-                borderWidth: 2,
+                backgroundColor: ['#2563EB', '#16A34A', '#D97706', '#7C3AED', '#DC2626', '#0891B2'],
+                borderWidth: 0,
+                hoverOffset: 6,
             }]
         },
         options: {
@@ -441,10 +447,14 @@ if (typeCtx) {
                 legend: { position: 'bottom' },
                 tooltip: {
                     callbacks: {
-                        label: ctx => ctx.label + ': ₱' +
-                               ctx.parsed.toLocaleString('en-PH', {
-                                   minimumFractionDigits: 2
-                               })
+                        label: ctx => {
+                            const total = ctx.dataset.data.reduce((sum, value) => sum + Number(value), 0);
+                            const amount = Number(ctx.parsed);
+                            const percent = total ? (amount / total * 100).toFixed(1) : '0.0';
+                            return ctx.label + ': ₱' + amount.toLocaleString('en-PH', {
+                                minimumFractionDigits: 2
+                            }) + ' (' + percent + '%)';
+                        }
                     }
                 }
             }

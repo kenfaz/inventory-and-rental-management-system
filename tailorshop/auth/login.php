@@ -116,10 +116,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     }
     .login-logo {
-      width: 60px; height: 60px;
-      background: #7C3AED; border-radius: 16px;
+      width: 104px; height: 104px;
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem; font-size: 28px; color: #fff;
+      margin: 0 auto 1rem;
+    }
+    .login-logo img {
+      width: 100%; height: 100%; object-fit: contain;
     }
     .btn-login {
       background: #7C3AED; border: none; color: #fff;
@@ -144,7 +146,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Logo and title -->
     <div class="text-center mb-4">
-      <div class="login-logo"><i class="bi bi-scissors"></i></div>
+      <div class="login-logo">
+        <img src="/tailorshop/public/assets/scissors_fabric_logo.svg"
+             alt="Desire's Tailor Shop logo">
+      </div>
       <h4 class="fw-bold mb-1"><?= APP_NAME ?></h4>
       <p class="text-muted small mb-0">Inventory and Sales Management System</p>
     </div>

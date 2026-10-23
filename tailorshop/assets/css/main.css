@@ -1,6 +1,12 @@
 /* ============================================================
    Desire's Tailor Shop — Global Styles
    ============================================================ */
+mark[data-live-search-match] {
+  color: inherit;
+  background: #facc15;
+  padding: 0 2px;
+  border-radius: 2px;
+}
 :root {
   color-scheme: dark;
   --primary:          #262626;
@@ -278,6 +284,32 @@ body.sidebar-collapsed .main-content {
   padding: 20px; display: flex; align-items: center; gap: 16px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.35);
 }
+.dashboard-stat-card {
+  min-height: 68px;
+  padding: 12px 14px;
+  gap: 10px;
+}
+.dashboard-stat-card .stat-icon {
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+}
+.dashboard-stat-card .stat-label { font-size: 11px; }
+.dashboard-stat-card .stat-value { font-size: 21px; }
+.income-insight-card .card-body { min-height: 112px; padding: 24px 28px; }
+.income-insight-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  background: #ECFEFF;
+  color: #0E7490;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+.income-insight-title { font-size: 16px; font-weight: 700; }
+.income-insight-text { font-size: 15px; line-height: 1.55; }
 .stat-icon {
   width: 48px; height: 48px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;

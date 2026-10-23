@@ -61,7 +61,59 @@ $monthRevenue = $pdo->query("
     WHERE MONTH(date_recorded) = MONTH(CURDATE())
       AND YEAR(date_recorded)  = YEAR(CURDATE())
 ")->fetchColumn();
+// ── Income interpretation ───────────────────────────────────
+$previousMonthRevenue = $pdo->query("
+    SELECT COALESCE(SUM(amount), 0) FROM income_records
+    WHERE date_recorded >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')
+      AND date_recorded < DATE_FORMAT(CURDATE(), '%Y-%m-01')
+")->fetchColumn();
 
+$topIncomeType = $pdo->query("
+    SELECT income_type, COALESCE(SUM(amount), 0) AS total
+    FROM income_records
+    WHERE MONTH(date_recorded) = MONTH(CURDATE())
+      AND YEAR(date_recorded) = YEAR(CURDATE())
+    GROUP BY income_type
+    ORDER BY total DESC
+    LIMIT 1
+")->fetch();
+
+if ((float)$previousMonthRevenue > 0) {
+    $incomeChangePercent = ((float)$monthRevenue - (float)$previousMonthRevenue)
+        / (float)$previousMonthRevenue * 100;
+} else {
+    $incomeChangePercent = (float)$monthRevenue > 0 ? 100.0 : 0.0;
+}
+
+if ((float)$monthRevenue <= 0) {
+    $incomeInsight = 'No income has been recorded for this month yet.';
+    $incomeInsightTone = 'text-muted';
+} elseif (abs($incomeChangePercent) < 0.05) {
+    $incomeInsight = 'Income is steady this month compared with last month.';
+    $incomeInsightTone = 'text-info';
+} elseif ($incomeChangePercent > 0) {
+    $incomeInsight = sprintf(
+        'Income increased %.1f%% compared with last month, totaling %s.',
+        $incomeChangePercent,
+        peso((float)$monthRevenue)
+    );
+    $incomeInsightTone = 'text-success';
+} else {
+    $incomeInsight = sprintf(
+        'Income decreased %.1f%% compared with last month, totaling %s.',
+        abs($incomeChangePercent),
+        peso((float)$monthRevenue)
+    );
+    $incomeInsightTone = 'text-danger';
+}
+
+if (!empty($topIncomeType) && (float)$topIncomeType['total'] > 0) {
+    $incomeInsight .= sprintf(
+        ' %s is the leading income source at %s.',
+        $topIncomeType['income_type'],
+        peso((float)$topIncomeType['total'])
+    );
+}
 // ── Overdue rentals detail ─────────────────────────────────
 $overdueRentals = $pdo->query("
     SELECT r.*,
@@ -168,17 +220,6 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       </div>
     <?php endif; ?>
 
-    <!-- Welcome -->
-    <div class="mb-4">
-      <h5 class="fw-bold mb-1">
-        Good <?= date('H') < 12 ? 'morning' : (date('H') < 17 ? 'afternoon' : 'evening') ?>,
-        <?= htmlspecialchars(explode(' ', $_SESSION['user_name'])[0]) ?>! 👋
-      </h5>
-      <p class="text-muted small mb-0">
-        Here's what's happening at <?= APP_NAME ?> today.
-      </p>
-    </div>
-
     <!-- Summary cards row -->
     <div class="row g-3 mb-4">
 
@@ -186,7 +227,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       <div class="col-sm-6 col-lg-3">
         <a href="/tailorshop/modules/rentals/index.php?status=Active"
            class="text-decoration-none">
-          <div class="stat-card" style="border-left:3px solid #1D4ED8">
+          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #1D4ED8">
             <div class="stat-icon" style="background:#EFF6FF;color:#1D4ED8">
               <i class="bi bi-handbag"></i>
             </div>
@@ -204,7 +245,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       <div class="col-sm-6 col-lg-3">
         <a href="/tailorshop/modules/rentals/index.php?status=Due+Today"
            class="text-decoration-none">
-          <div class="stat-card" style="border-left:3px solid #D97706">
+          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #D97706">
             <div class="stat-icon" style="background:#FEF3C7;color:#92400E">
               <i class="bi bi-clock-history"></i>
             </div>
@@ -222,7 +263,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       <div class="col-sm-6 col-lg-3">
         <a href="/tailorshop/modules/rentals/index.php?status=Overdue"
            class="text-decoration-none">
-          <div class="stat-card" style="border-left:3px solid #DC2626">
+          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #DC2626">
             <div class="stat-icon" style="background:#FEF2F2;color:#991B1B">
               <i class="bi bi-exclamation-circle"></i>
             </div>
@@ -240,7 +281,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       <div class="col-sm-6 col-lg-3">
         <a href="/tailorshop/modules/sales/reports.php?period=daily"
            class="text-decoration-none">
-          <div class="stat-card" style="border-left:3px solid #059669">
+          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #059669">
             <div class="stat-icon" style="background:#F0FDF4;color:#166534">
               <i class="bi bi-cash-stack"></i>
             </div>
@@ -262,7 +303,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       <div class="col-sm-4">
         <a href="/tailorshop/modules/reservations/index.php?status=Confirmed"
            class="text-decoration-none">
-          <div class="stat-card" style="border-left:3px solid #7C3AED">
+          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #7C3AED">
             <div class="stat-icon" style="background:#EDE9FE;color:#6D28D9">
               <i class="bi bi-calendar-check"></i>
             </div>
@@ -279,7 +320,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       <div class="col-sm-4">
         <a href="/tailorshop/modules/tailoring/index.php"
            class="text-decoration-none">
-          <div class="stat-card" style="border-left:3px solid #C2410C">
+          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #C2410C">
             <div class="stat-icon" style="background:#FFF7ED;color:#C2410C">
               <i class="bi bi-scissors"></i>
             </div>
@@ -296,7 +337,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
       <div class="col-sm-4">
         <a href="/tailorshop/modules/sales/reports.php?period=monthly"
            class="text-decoration-none">
-          <div class="stat-card" style="border-left:3px solid #0891B2">
+          <div class="stat-card dashboard-stat-card" style="border-left:3px solid #0891B2">
             <div class="stat-icon" style="background:#ECFEFF;color:#0E7490">
               <i class="bi bi-graph-up"></i>
             </div>
@@ -310,6 +351,20 @@ require_once __DIR__ . '/../../includes/sidebar.php';
         </a>
       </div>
 
+    </div>
+
+    <div class="card income-insight-card mb-4">
+      <div class="card-body d-flex align-items-center gap-4">
+        <div class="income-insight-icon flex-shrink-0">
+          <i class="bi bi-chat-left-text"></i>
+        </div>
+        <div>
+          <div class="income-insight-title mb-2">Income Insight</div>
+          <p class="income-insight-text mb-0 <?= $incomeInsightTone ?>">
+            <?= htmlspecialchars($incomeInsight) ?>
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Main content grid -->
@@ -557,6 +612,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script>
 const ctx7d = document.getElementById('revenue-7d');
+const dashboardChartGridColor = document.documentElement.dataset.theme === 'light' ? '#000000' : '#FFFFFF';
 if (ctx7d) {
     new Chart(ctx7d, {
         type: 'bar',
@@ -565,10 +621,9 @@ if (ctx7d) {
             datasets: [{
                 label: 'Revenue (₱)',
                 data:  <?= json_encode(array_column($revenueChart, 'amount')) ?>,
-                backgroundColor: 'rgba(124,58,237,0.15)',
-                borderColor: 'rgba(124,58,237,0.8)',
-                borderWidth: 2,
-                borderRadius: 6,
+                backgroundColor: '#2563EB',
+                borderWidth: 0,
+                borderRadius: 4,
             }]
         },
         options: {
@@ -584,8 +639,14 @@ if (ctx7d) {
                 }
             },
             scales: {
+                x: {
+                    grid: { color: dashboardChartGridColor },
+                    border: { color: dashboardChartGridColor }
+                },
                 y: {
                     beginAtZero: true,
+                    grid: { color: dashboardChartGridColor },
+                    border: { color: dashboardChartGridColor },
                     ticks: { callback: v => '₱' + v.toLocaleString('en-PH') }
                 }
             }

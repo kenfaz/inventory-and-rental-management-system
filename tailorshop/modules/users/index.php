@@ -134,14 +134,16 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                       <i class="bi bi-pencil"></i>
                     </a>
                     <?php if (!$isCurrentUser): ?>
-                      <a href="/tailorshop/modules/users/deactivate.php?id=<?= $u['user_id'] ?>"
-                         class="btn btn-sm <?= $u['status'] === 'active'
-                             ? 'btn-outline-danger' : 'btn-outline-success' ?>"
-                         data-confirm="<?= $u['status'] === 'active'
-                             ? 'Deactivate this account?' : 'Reactivate this account?' ?>">
+                      <button type="button"
+                              class="btn btn-sm <?= $u['status'] === 'active'
+                                  ? 'btn-outline-danger' : 'btn-outline-success' ?>"
+                              data-account-status-action
+                              data-action-url="/tailorshop/modules/users/deactivate.php?id=<?= $u['user_id'] ?>"
+                              data-account-name="<?= htmlspecialchars($u['full_name'], ENT_QUOTES, 'UTF-8') ?>"
+                              data-next-status="<?= $u['status'] === 'active' ? 'inactive' : 'active' ?>">
                         <i class="bi <?= $u['status'] === 'active'
                             ? 'bi-person-x' : 'bi-person-check' ?>"></i>
-                      </a>
+                      </button>
                     <?php endif; ?>
                   </div>
                 </td>
@@ -154,5 +156,59 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 
   </div>
 </div>
+
+<div class="modal fade" id="accountStatusModal" tabindex="-1"
+     aria-labelledby="accountStatusTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" id="accountStatusHeader">
+        <h5 class="modal-title" id="accountStatusTitle">
+          <i class="bi me-2" id="accountStatusIcon"></i>
+          <span id="accountStatusHeading">Change Account Status</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="accountStatusMessage" class="mb-0"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" class="btn" id="accountStatusConfirm">Confirm</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modalElement = document.getElementById('accountStatusModal');
+  const confirmButton = document.getElementById('accountStatusConfirm');
+  const heading = document.getElementById('accountStatusHeading');
+  const message = document.getElementById('accountStatusMessage');
+  const icon = document.getElementById('accountStatusIcon');
+  const header = document.getElementById('accountStatusHeader');
+  if (!modalElement || !confirmButton || !window.bootstrap) return;
+
+  const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+  document.querySelectorAll('[data-account-status-action]').forEach(button => {
+    button.addEventListener('click', () => {
+      const accountName = button.dataset.accountName;
+      const isDeactivation = button.dataset.nextStatus === 'inactive';
+
+      heading.textContent = isDeactivation ? 'Deactivate Account?' : 'Reactivate Account?';
+      message.textContent = isDeactivation
+        ? `Do you want to deactivate ${accountName}? The user will no longer be able to sign in.`
+        : `Do you want to reactivate ${accountName}? The user will be able to sign in again.`;
+      icon.className = `bi me-2 ${isDeactivation ? 'bi-person-x-fill text-danger' : 'bi-person-check-fill text-success'}`;
+      header.className = `modal-header ${isDeactivation ? 'border-danger' : 'border-success'}`;
+      confirmButton.className = `btn ${isDeactivation ? 'btn-danger' : 'btn-success'}`;
+      confirmButton.textContent = isDeactivation ? 'Deactivate Account' : 'Reactivate Account';
+      confirmButton.href = button.dataset.actionUrl;
+      modal.show();
+    });
+  });
+});
+</script>
 
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

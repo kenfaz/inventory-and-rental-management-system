@@ -13,15 +13,6 @@ $role       = $_SESSION['user_role'];
 
 $search = trim($_GET['q'] ?? '');
 
-$where  = [];
-$params = [];
-if ($search !== '') {
-    $where[]  = '(c.full_name LIKE ? OR c.mobile_number LIKE ? OR c.email LIKE ? OR c.address LIKE ?)';
-    $like     = '%' . $search . '%';
-    $params   = [$like, $like, $like, $like];
-}
-$whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-
 $stmt = $pdo->prepare("
     SELECT c.*,
            COUNT(DISTINCT r.rental_id)      AS total_rentals,
@@ -31,11 +22,10 @@ $stmt = $pdo->prepare("
     LEFT JOIN rentals      r   ON r.customer_id   = c.customer_id
     LEFT JOIN reservations res ON res.customer_id = c.customer_id
     LEFT JOIN tailoring_orders o ON o.customer_id = c.customer_id
-    $whereSQL
     GROUP BY c.customer_id
     ORDER BY c.full_name ASC
 ");
-$stmt->execute($params);
+$stmt->execute();
 $customers = $stmt->fetchAll();
 
 $success = $_SESSION['success'] ?? '';
