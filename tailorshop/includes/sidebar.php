@@ -181,6 +181,12 @@ function navActive(string $page, string $current): string {
           <i class="bi bi-gear"></i> Settings
         </a>
       </li>
+      <li>
+        <a href="/tailorshop/modules/settings/erd.php"
+           class="<?= navActive('erd', $activePage) ?>">
+          <i class="bi bi-diagram-3"></i> Database ERD
+        </a>
+      </li>
     </ul>
   <?php endif; ?>
   </nav>
