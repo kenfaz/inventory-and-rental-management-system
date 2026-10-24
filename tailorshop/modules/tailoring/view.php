@@ -239,6 +239,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
               <i class="bi bi-rulers me-2 text-primary"></i>Customer Measurements
             </div>
             <div class="card-body p-4">
+              <?php require_once __DIR__ . '/measurement-guide.php'; ?>
               <div class="row g-3">
                 <?php
                 $measDisplay = [

@@ -312,6 +312,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
               <hr class="my-4">
               <p class="form-section-label">Measurements (inches)</p>
 
+              <?php require_once __DIR__ . '/measurement-guide.php'; ?>
               <div class="row g-3 mb-4">
                 <?php
                 $measFields = [

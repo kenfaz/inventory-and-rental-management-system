@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 360" role="img" aria-labelledby="title desc">
+  <title id="title">Body measurement reference</title>
+  <desc id="desc">Front-view figure with numbered markers at the shoulder, bust, waist, hips, garment length, and sleeve.</desc>
+  <defs>
+    <style>
+      .body { fill: #737373; }
+      .measure { fill: none; stroke: #ffe100; stroke-width: 3; stroke-linecap: round; }
+      .guide { fill: none; stroke: #ffe100; stroke-width: 2; stroke-dasharray: 5 4; }
+      .marker { fill: #ffe100; stroke: #171717; stroke-width: 1.5; }
+      .number { fill: #171717; font: 700 11px Arial, sans-serif; text-anchor: middle; dominant-baseline: central; }
+    </style>
+  </defs>
+  <circle class="body" cx="130" cy="35" r="21"/>
+  <path class="body" d="M120 55h20v19h-20z"/>
+  <path class="body" d="M118 70c-15 2-25 9-31 21l-26 69c-3 8 2 14 8 11l25-51 5 44c2 16 6 29 13 39l-3 12 9 7 17-4 5-2 5 2 17 4 9-7-3-12c7-10 11-23 13-39l5-44 25 51c6 3 11-3 8-11l-26-69c-6-12-16-19-31-21l-15-2h-28z"/>
+  <path class="body" d="M109 215c-3 28-6 61-5 91l-2 39c4 6 12 6 16 1l9-39 6-45 3-45-12-5z"/>
+  <path class="body" d="M151 212l-12 5 3 45 6 45 9 39c4 5 12 5 16-1l-2-39c1-30-2-63-5-91z"/>
+
+  <path class="guide" d="M105 91h50"/>
+  <path class="measure" d="M99 94h62"/>
+  <circle class="marker" cx="176" cy="94" r="10"/>
+  <text class="number" x="176" y="94">5</text>
+
+  <path class="guide" d="M91 133h78"/>
+  <path class="measure" d="M94 136h72"/>
+  <circle class="marker" cx="179" cy="136" r="10"/>
+  <text class="number" x="179" y="136">1</text>
+
+  <path class="guide" d="M100 166h60"/>
+  <path class="measure" d="M103 169h54"/>
+  <circle class="marker" cx="176" cy="169" r="10"/>
+  <text class="number" x="176" y="169">2</text>
+
+  <path class="guide" d="M103 198h54"/>
+  <path class="measure" d="M106 201h48"/>
+  <circle class="marker" cx="173" cy="201" r="10"/>
+  <text class="number" x="173" y="201">3</text>
+
+  <path class="measure" d="M72 103v134"/>
+  <path class="guide" d="M67 103h35M67 237h39"/>
+  <circle class="marker" cx="61" cy="170" r="10"/>
+  <text class="number" x="61" y="170">4</text>
+
+  <path class="measure" d="M82 99 64 148"/>
+  <circle class="marker" cx="56" cy="158" r="10"/>
+  <text class="number" x="56" y="158">6</text>
+</svg>

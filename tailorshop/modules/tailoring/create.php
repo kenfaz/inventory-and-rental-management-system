@@ -321,6 +321,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 
               <!-- Section: Measurements -->
               <p class="form-section-label">Customer Measurements <span class="text-muted" style="font-weight:400;text-transform:none;letter-spacing:0">(in inches — optional)</span></p>
+              <?php require_once __DIR__ . '/measurement-guide.php'; ?>
               <div class="row g-3 mb-3">
                 <?php
                 $measFields = [

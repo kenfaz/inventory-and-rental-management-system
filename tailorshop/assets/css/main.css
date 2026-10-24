@@ -533,6 +533,123 @@ body.sidebar-collapsed .main-content {
   letter-spacing: .06em; color: var(--text-secondary); margin-bottom: 8px;
 }
 
+.measurement-guide {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-raised);
+}
+.measurement-guide-figure {
+  margin: 0;
+  text-align: center;
+}
+.measurement-guide-viewport {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,.08), transparent 72%);
+}
+.measurement-guide-viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  outline-offset: -3px;
+}
+.measurement-guide-loading,
+.measurement-guide-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  background: var(--surface-raised);
+}
+.measurement-guide-loading[hidden],
+.measurement-guide-error[hidden] {
+  display: none;
+}
+.measurement-guide-error img {
+  height: 190px;
+  max-width: 100%;
+  object-fit: contain;
+}
+.measurement-guide-hint,
+.measurement-guide-caption {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+.measurement-guide-hint {
+  margin-top: 4px;
+}
+.measurement-guide-caption {
+  margin-top: 4px;
+}
+.measurement-guide-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.measurement-guide-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.measurement-guide-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffe100;
+  color: #171717;
+  font-size: 12px;
+  font-weight: 700;
+}
+.measurement-guide-list strong,
+.measurement-guide-list small {
+  display: block;
+}
+.measurement-guide-list strong {
+  font-size: 12px;
+  line-height: 1.4;
+}
+.measurement-guide-list small {
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
+}
+@media (max-width: 575.98px) {
+  .measurement-guide {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .measurement-guide-figure img {
+    max-height: 190px;
+  }
+  .measurement-guide-viewport {
+    height: 240px;
+  }
+}
+
 /* ══════════════════════════════════════════════════════════
    ALERTS
    ══════════════════════════════════════════════════════════ */
