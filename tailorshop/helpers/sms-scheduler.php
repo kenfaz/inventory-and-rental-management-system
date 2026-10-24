@@ -189,21 +189,30 @@ function runSMSScheduler(): array {
         WHERE quantity <= low_stock_threshold
         ORDER BY item_name
     ')->fetchAll();
-    foreach ($lowStockItems as $item) {
-        $itemId = (int)$item['item_id'];
-        $trigger = 'Low Stock Alert';
 
-        if (!smsAttemptedToday(ADMIN_SMS_NUMBER, $trigger, $itemId, 'material_items')) {
+    $trigger = 'Low Stock Alert';
+    if (
+        $lowStockItems &&
+        !smsAttemptedToday(LOW_STOCK_SMS_NUMBER, $trigger, 0, 'material_items_summary')
+    ) {
+        try {
             $sent = sendSMS(
-                ADMIN_SMS_NUMBER,
-                buildLowStockSMS($item),
+                LOW_STOCK_SMS_NUMBER,
+                buildLowStockSMS($lowStockItems),
                 $trigger,
-                $itemId,
-                'material_items'
+                0,
+                'material_items_summary'
             );
             $log[] = ($sent ? (SMS_MOCK_MODE ? 'SMS MOCKED' : 'SMS SENT') : 'SMS FAILED') .
-                     ' — Low stock alert for ' . $item['item_name'];
+                     ' — Combined low stock alert for ' . count($lowStockItems) . ' item(s)';
+        } catch (LengthException $e) {
+            error_log('Combined low-stock SMS skipped: ' . $e->getMessage());
+            $log[] = 'SMS SKIPPED — Combined low-stock alert exceeds UniSMS 670-character limit';
         }
+    }
+
+    foreach ($lowStockItems as $item) {
+        $itemId = (int)$item['item_id'];
 
         $message = buildLowStockEmail($item);
         foreach ($adminRecipients as $admin) {

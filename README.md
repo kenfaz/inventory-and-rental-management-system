@@ -39,12 +39,14 @@ uses PHPMailer and the local Mailpit SMTP service by default:
 - New customers must have a valid email address. Legacy customer records may
   keep an empty email; those customers continue to receive SMS only.
 - SMS uses UniSMS. Configure `UNISMS_SECRET_KEY` and `UNISMS_SENDER_ID` in
-  `.env` and set the admin phone number in `tailorshop/config/constants.php`.
+  `.env`; rental and overdue alerts use the admin phone number in
+  `tailorshop/config/constants.php`. Low-stock SMS alerts go to
+  `LOW_STOCK_SMS_NUMBER` (defaults to `09663758221`) as one combined message
+  containing all low-stock items. Override that number in `.env` if needed.
+  The combined message is skipped if it exceeds UniSMS's 670-character limit.
   Live SMS requests can incur charges; email remains local to Mailpit with
   the default configuration.
 
   ## SMS Mobile View
 <img width="1267" height="672" alt="image" src="https://github.com/user-attachments/assets/e8cbf52d-87db-4fb2-a11c-4e0f30751564" />
-
-
 

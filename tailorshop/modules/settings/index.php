@@ -111,8 +111,10 @@ require_once __DIR__ . '/../../includes/sidebar.php';
           <div class="card-body p-4">
             <p class="text-muted small mb-3">
               SMS credentials are read from the project root
-              <code>.env</code> file. The admin number and reminder schedule
-              are configured in <code>config/constants.php</code>.
+              <code>.env</code> file. The rental/overdue admin number and
+              reminder schedule are configured in <code>config/constants.php</code>;
+              the low-stock number can be overridden with
+              <code>LOW_STOCK_SMS_NUMBER</code>.
             </p>
             <dl class="row mb-0" style="font-size:13.5px">
               <dt class="col-6 text-muted fw-normal">SMS Mode</dt>
@@ -138,6 +140,10 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                 <?= defined('ADMIN_SMS_NUMBER')
                     ? htmlspecialchars(ADMIN_SMS_NUMBER)
                     : '<span class="text-danger">Not configured</span>' ?>
+              </dd>
+              <dt class="col-6 text-muted fw-normal">Low-stock SMS Number</dt>
+              <dd class="col-6 fw-medium">
+                <?= htmlspecialchars(LOW_STOCK_SMS_NUMBER) ?>
               </dd>
               <dt class="col-6 text-muted fw-normal">Rental Reminder</dt>
               <dd class="col-6"><?= RENTAL_REMINDER_DAYS ?> days before return</dd>

@@ -66,6 +66,7 @@ define('MAIL_FROM_NAME', getenv('MAIL_FROM_NAME') ?: APP_NAME);
 // ── SMS Notification Settings ────────────────────────────────
 // Admin/owner mobile number — receives low stock and overdue alerts
 define('ADMIN_SMS_NUMBER',     '09397271618');
+define('LOW_STOCK_SMS_NUMBER', getenv('LOW_STOCK_SMS_NUMBER') ?: '09663758221');
 
 // Days before rental return to send reminder SMS
 define('RENTAL_REMINDER_DAYS', 3);

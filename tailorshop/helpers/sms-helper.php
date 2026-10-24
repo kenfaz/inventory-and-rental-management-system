@@ -232,18 +232,31 @@ function buildOverdueOwnerSMS(array $rental): string {
 }
 
 /**
- * Build low stock alert SMS — sent to owner
+ * Build one compact SMS containing every low-stock item
  */
-function buildLowStockSMS(array $item): string {
-    return sprintf(
-        "LOW STOCK ALERT [%s]: %s (%s) is low. " .
-        "Current stock: %s %s. Please restock soon.",
-        SHOP_NAME,
-        $item['item_name'],
-        $item['brand'] ?? 'No brand',
-        rtrim(rtrim(number_format($item['quantity'], 2), '0'), '.'),
-        $item['unit']
-    );
+function buildLowStockSMS(array $items): string {
+    $stockDetails = [];
+    foreach ($items as $item) {
+        $itemName = trim((string)$item['item_name']);
+        $unit = trim((string)$item['unit']);
+        if ($itemName === '' || $unit === '') {
+            throw new UnexpectedValueException('Low-stock SMS items require a name and unit.');
+        }
+
+        $quantity = rtrim(rtrim(number_format((float)$item['quantity'], 2, '.', ''), '0'), '.');
+        $stockDetails[] = sprintf('%s %s%s', $itemName, $quantity, $unit);
+    }
+
+    $message = 'LOW STOCK: ' . implode('; ', $stockDetails);
+    $characterCount = preg_match_all('/./us', $message);
+    if ($characterCount === false) {
+        throw new UnexpectedValueException('Low-stock SMS values must be valid UTF-8.');
+    }
+    if ($characterCount > 670) {
+        throw new LengthException('Combined low-stock SMS exceeds UniSMS 670-character limit.');
+    }
+
+    return $message;
 }
 
 /**
