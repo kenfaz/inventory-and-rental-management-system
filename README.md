@@ -15,6 +15,10 @@ uses PHPMailer and the local Mailpit SMTP service by default:
 - Copy the root `.env.example` to `.env` and add your UniSMS secret key and
   sender ID. The local `.env` file is ignored by Git; operating-system
   environment variables take precedence over values in that file.
+- Outbound SMS content is transliterated to standard ASCII before sending to
+  avoid UniSMS rejecting emoji or non-standard characters. For example, the
+  peso sign is written as `PHP` and typographic punctuation is converted to
+  plain ASCII.
 - SMS mock mode is enabled by default (`SMS_MOCK_MODE=true`): messages are
   generated and recorded in SMS Logs as “Mocked — not sent,” without contacting
   UniSMS or consuming credits. Set `SMS_MOCK_MODE=false` to enable live SMS.
@@ -34,6 +38,13 @@ uses PHPMailer and the local Mailpit SMTP service by default:
   physical phone. Mocked messages are recorded in the database but never sent
   to UniSMS or charged. Switch `SMS_MOCK_MODE=false` only when you intend to
   send real SMS; the simulator's demo button is disabled in live mode.
+- Admins can open **Admin → Pending Notifications** to review scheduled
+  notifications currently due and the latest failed SMS/email attempts.
+  Scheduled items are calculated from current records rather than held in a
+  separate queue. Admins can send due items or retry failed attempts; SMS
+  actions are disabled while mock mode is enabled, except for the combined
+  low-stock SMS, which can be explicitly sent live from this page. Other SMS
+  notifications remain mocked. Live SMS may incur charges.
 - Existing databases must run `tailorshop/database/migrate-email-notifications.sql`
   once before using email notifications.
 - New customers must have a valid email address. Legacy customer records may
@@ -49,4 +60,3 @@ uses PHPMailer and the local Mailpit SMTP service by default:
 
   ## SMS Mobile View
 <img width="1267" height="672" alt="image" src="https://github.com/user-attachments/assets/e8cbf52d-87db-4fb2-a11c-4e0f30751564" />
-

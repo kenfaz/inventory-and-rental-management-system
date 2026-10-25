@@ -176,6 +176,12 @@ function navActive(string $page, string $current): string {
         </a>
       </li>
       <li>
+        <a href="/tailorshop/modules/logs/pending-notifications.php"
+           class="<?= navActive('pending-notifications', $activePage) ?>">
+          <i class="bi bi-send-exclamation"></i> Pending Notifications
+        </a>
+      </li>
+      <li>
         <a href="/tailorshop/modules/settings/index.php"
            class="<?= navActive('settings', $activePage) ?>">
           <i class="bi bi-gear"></i> Settings

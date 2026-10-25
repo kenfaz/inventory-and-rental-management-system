@@ -7,6 +7,31 @@
 require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../config/db.php';
 
+function normalizeSmsMessage(string $message): string {
+    $message = strtr($message, [
+        '₱' => 'PHP ',
+        '—' => '-',
+        '–' => '-',
+        '“' => '"',
+        '”' => '"',
+        '‘' => "'",
+        '’' => "'",
+        '…' => '...',
+        '×' => 'x',
+        '•' => '*',
+    ]);
+
+    if (function_exists('iconv')) {
+        $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $message);
+        if ($transliterated !== false) {
+            $message = $transliterated;
+        }
+    }
+
+    $asciiMessage = preg_replace('/[^\x20-\x7E\r\n\t]/', '', $message);
+    return trim($asciiMessage ?? '');
+}
+
 /**
  * Send an SMS via UniSMS API
  *
@@ -22,15 +47,30 @@ function sendSMS(
     string $message,
     string $triggerType,
     ?int   $referenceId   = null,
-    ?string $referenceType = null
+    ?string $referenceType = null,
+    bool $allowLowStockLiveInMockMode = false
 ): bool {
     global $pdo;
 
+    if (
+        $allowLowStockLiveInMockMode &&
+        ($triggerType !== 'Low Stock Alert' || $referenceType !== 'material_items_summary')
+    ) {
+        throw new InvalidArgumentException(
+            'Live SMS override is only available for combined low-stock alerts.'
+        );
+    }
+
     $status        = 'Failed';
     $failureReason = null;
+    $message = normalizeSmsMessage($message);
 
     try {
-        if (SMS_MOCK_MODE) {
+        if ($message === '') {
+            throw new InvalidArgumentException('SMS message has no standard characters to send.');
+        }
+
+        if (SMS_MOCK_MODE && !$allowLowStockLiveInMockMode) {
             $status = 'Mocked';
         } else {
             if (
@@ -131,6 +171,29 @@ function smsAttemptedToday(
           AND trigger_type = ?
           AND reference_id = ?
           AND reference_type = ?
+          AND DATE(timestamp) = CURDATE()
+    ');
+    $stmt->execute([$number, $triggerType, $referenceId, $referenceType]);
+
+    return (int)$stmt->fetchColumn() > 0;
+}
+
+function liveSmsAttemptedToday(
+    string $number,
+    string $triggerType,
+    int $referenceId,
+    string $referenceType
+): bool {
+    global $pdo;
+
+    $stmt = $pdo->prepare('
+        SELECT COUNT(*)
+        FROM sms_logs
+        WHERE recipient_number = ?
+          AND trigger_type = ?
+          AND reference_id = ?
+          AND reference_type = ?
+          AND status IN ("Sent", "Failed")
           AND DATE(timestamp) = CURDATE()
     ');
     $stmt->execute([$number, $triggerType, $referenceId, $referenceType]);
@@ -248,11 +311,8 @@ function buildLowStockSMS(array $items): string {
     }
 
     $message = 'LOW STOCK: ' . implode('; ', $stockDetails);
-    $characterCount = preg_match_all('/./us', $message);
-    if ($characterCount === false) {
-        throw new UnexpectedValueException('Low-stock SMS values must be valid UTF-8.');
-    }
-    if ($characterCount > 670) {
+    $message = normalizeSmsMessage($message);
+    if (strlen($message) > 670) {
         throw new LengthException('Combined low-stock SMS exceeds UniSMS 670-character limit.');
     }
 
